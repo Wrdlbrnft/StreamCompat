@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/StreamCompat.iml" filepath="$PROJECT_DIR$/StreamCompat.iml" />
+      <module fileurl="file://$PROJECT_DIR$/StreamCompat.iml" filepath="$PROJECT_DIR$/StreamCompat.iml" />
+      <module fileurl="file://$PROJECT_DIR$/StreamCompat/StreamCompat-StreamCompat.iml" filepath="$PROJECT_DIR$/StreamCompat/StreamCompat-StreamCompat.iml" />
       <module fileurl="file://$PROJECT_DIR$/StreamCompat/StreamCompat-StreamCompat.iml" filepath="$PROJECT_DIR$/StreamCompat/StreamCompat-StreamCompat.iml" />
     </modules>
   </component>
