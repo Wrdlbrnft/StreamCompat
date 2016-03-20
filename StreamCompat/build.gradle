@@ -1,5 +1,8 @@
 apply plugin: 'com.android.library'
 apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
 
 android {
     compileSdkVersion 'android-N'
@@ -15,10 +18,6 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-        debug {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
     }
     compileOptions {
         sourceCompatibility 1.8
@@ -27,8 +26,44 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:23.2.1'
-    compile 'com.android.support:design:23.2.1'
+
+}
+
+String bintrayUser = hasProperty('bintray_user') ? property('bintray_user') : ''
+String bintrayApiKey = hasProperty('bintray_api_key') ? property('bintray_api_key') : ''
+String versionName = hasProperty('version_name') ? property('version_name') : ''
+
+task sourceJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier "source"
+}
+
+publishing {
+    publications {
+        Bintray(MavenPublication) {
+            groupId 'com.github.wrdlbrnft'
+            artifactId 'stream-compat'
+            version versionName
+            artifact(sourceJar)
+            artifact("$buildDir/outputs/aar/StreamCompat-release.aar")
+        }
+    }
+}
+
+bintray {
+    user = bintrayUser
+    key = bintrayApiKey
+    publications = ['Bintray']
+    pkg {
+        repo = 'maven'
+        name = 'StreamCompat'
+        userOrg = bintrayUser
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/Wrdlbrnft/StreamCompat'
+        publicDownloadNumbers = true
+        version {
+            name = versionName
+            released = new Date()
+        }
+    }
 }
