@@ -5,12 +5,12 @@ apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
 android {
-    compileSdkVersion 'android-N'
+    compileSdkVersion 23
     buildToolsVersion "24.0.0 rc1"
 
     defaultConfig {
         minSdkVersion 7
-        targetSdkVersion 'N'
+        targetSdkVersion 23
     }
 
     buildTypes {
@@ -26,7 +26,7 @@ android {
 }
 
 dependencies {
-
+    compile 'com.android.support:support-v4:23.2.0'
 }
 
 String bintrayUser = hasProperty('bintray_user') ? property('bintray_user') : ''
