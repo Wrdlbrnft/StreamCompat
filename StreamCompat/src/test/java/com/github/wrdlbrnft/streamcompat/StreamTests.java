@@ -1,7 +1,9 @@
 package com.github.wrdlbrnft.streamcompat;
 
-import com.github.wrdlbrnft.streamcompat.longstream.LongStreamCompat;
+import com.github.wrdlbrnft.streamcompat.charstream.CharStreamCompat;
+import com.github.wrdlbrnft.streamcompat.stream.StreamCompat;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -11,10 +13,11 @@ public class StreamTests {
 
     @Test
     public void testBasicIntStream() {
-        final long result = LongStreamCompat.range(1, 1000000000)
-                .map(i -> i / 10000000L)
-                .sum();
+        final long result = StreamCompat.of("ASDF", "test", "wwwew", "z", "qqq", "sdalgekasdgkl", "q[rgeeu0", "zflb;ndz")
+                .flatMapToChar(text -> CharStreamCompat.of(text.toCharArray()))
+                .filter(c -> c == 'e')
+                .count();
 
-        System.out.println(result);
+        Assert.assertEquals(5, result);
     }
 }

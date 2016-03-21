@@ -29,6 +29,11 @@ public interface Stream<T> extends Iterable<T> {
     FloatStream mapToFloat(ToFloatFunction<? super T> mapper);
     CharStream mapToChar(ToCharFunction<? super T> mapper);
     <R> Stream<R> flatMap(Function<T, ? extends Stream<? extends R>> mapper);
+    IntStream flatMapToInt(Function<? super T, ? extends IntStream> mapper);
+    LongStream flatMapToLong(Function<? super T, ? extends LongStream> mapper);
+    FloatStream flatMapToFloat(Function<? super T, ? extends FloatStream> mapper);
+    DoubleStream flatMapToDouble(Function<? super T, ? extends DoubleStream> mapper);
+    CharStream flatMapToChar(Function<? super T, ? extends CharStream> mapper);
     <A, R> R collect(Collector<T, A, R> function);
     Stream<T> limit(long count);
     Optional<T> reduce(BinaryOperator<T> accumulator);

@@ -97,6 +97,41 @@ class StreamImpl<T> implements Stream<T> {
     }
 
     @Override
+    public IntStream flatMapToInt(Function<? super T, ? extends IntStream> mapper) {
+        Utils.requireNonNull(mapper);
+        final IntIterator iterator = new FlatMapToIntIterator<>(mIterator, mapper);
+        return IntStreamCompat.of(iterator);
+    }
+
+    @Override
+    public LongStream flatMapToLong(Function<? super T, ? extends LongStream> mapper) {
+        Utils.requireNonNull(mapper);
+        final LongIterator iterator = new FlatMapToLongIterator<>(mIterator, mapper);
+        return LongStreamCompat.of(iterator);
+    }
+
+    @Override
+    public FloatStream flatMapToFloat(Function<? super T, ? extends FloatStream> mapper) {
+        Utils.requireNonNull(mapper);
+        final FloatIterator iterator = new FlatMapToFloatIterator<>(mIterator, mapper);
+        return FloatStreamCompat.of(iterator);
+    }
+
+    @Override
+    public DoubleStream flatMapToDouble(Function<? super T, ? extends DoubleStream> mapper) {
+        Utils.requireNonNull(mapper);
+        final DoubleIterator iterator = new FlatMapToDoubleIterator<>(mIterator, mapper);
+        return DoubleStreamCompat.of(iterator);
+    }
+
+    @Override
+    public CharStream flatMapToChar(Function<? super T, ? extends CharStream> mapper) {
+        Utils.requireNonNull(mapper);
+        final CharIterator iterator = new FlatMapToCharIterator<>(mIterator, mapper);
+        return CharStreamCompat.of(iterator);
+    }
+
+    @Override
     public <A, R> R collect(Collector<T, A, R> function) {
         Utils.requireNonNull(function);
         final A result = function.supplier().get();
