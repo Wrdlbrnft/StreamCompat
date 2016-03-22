@@ -105,7 +105,7 @@ class LongStreamImpl implements LongStream {
 
     @Override
     public Stream<Long> boxed() {
-        return StreamCompat.of(mIterator);
+        return mapToObj(Long::valueOf);
     }
 
     @Override

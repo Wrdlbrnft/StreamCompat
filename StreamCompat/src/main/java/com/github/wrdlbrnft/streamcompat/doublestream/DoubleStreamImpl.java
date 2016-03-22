@@ -105,7 +105,7 @@ class DoubleStreamImpl implements DoubleStream {
 
     @Override
     public Stream<Double> boxed() {
-        return StreamCompat.of(mIterator);
+        return mapToObj(Double::valueOf);
     }
 
     @Override

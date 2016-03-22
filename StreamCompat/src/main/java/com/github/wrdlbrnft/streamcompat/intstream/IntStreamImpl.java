@@ -105,7 +105,7 @@ class IntStreamImpl implements IntStream {
 
     @Override
     public Stream<Integer> boxed() {
-        return StreamCompat.of(mIterator);
+        return mapToObj(Integer::valueOf);
     }
 
     @Override

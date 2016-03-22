@@ -105,7 +105,7 @@ class FloatStreamImpl implements FloatStream {
 
     @Override
     public Stream<Float> boxed() {
-        return StreamCompat.of(mIterator);
+        return mapToObj(Float::valueOf);
     }
 
     @Override

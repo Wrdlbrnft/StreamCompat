@@ -105,7 +105,7 @@ class CharacterStreamImpl implements CharacterStream {
 
     @Override
     public Stream<Character> boxed() {
-        return StreamCompat.of(mIterator);
+        return mapToObj(Character::valueOf);
     }
 
     @Override
