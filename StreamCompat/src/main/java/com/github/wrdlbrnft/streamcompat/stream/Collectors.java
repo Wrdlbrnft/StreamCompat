@@ -10,7 +10,9 @@ import com.github.wrdlbrnft.streamcompat.function.Function;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
 import com.github.wrdlbrnft.streamcompat.function.ToIntFunction;
 import com.github.wrdlbrnft.streamcompat.function.ToLongFunction;
+import com.github.wrdlbrnft.streamcompat.util.LongSparseArrayCompat;
 import com.github.wrdlbrnft.streamcompat.util.MapCompat;
+import com.github.wrdlbrnft.streamcompat.util.SparseArrayCompat;
 import com.github.wrdlbrnft.streamcompat.util.StringJoiner;
 import com.github.wrdlbrnft.streamcompat.util.Utils;
 
@@ -190,6 +192,64 @@ public class Collectors {
 
     public static <T, K> Collector<T, ?, Map<K, List<T>>> groupingBy(Function<? super T, ? extends K> classifier) {
         return groupingBy(classifier, toList());
+    }
+
+    public static <T, A, D> Collector<T, ?, SparseArray<D>> groupingInSparseArray(ToIntFunction<? super T> classifier, Collector<? super T, A, D> downstream) {
+
+        final Supplier<A> downstreamSupplier = downstream.supplier();
+        final BiConsumer<A, ? super T> downstreamAccumulator = downstream.accumulator();
+        final BiConsumer<SparseArray<A>, T> accumulator = (m, t) -> {
+            final int key = classifier.apply(t);
+            A container = SparseArrayCompat.computeIfAbsent(m, key, k -> downstreamSupplier.get());
+            downstreamAccumulator.accept(container, t);
+        };
+
+        @SuppressWarnings("unchecked")
+        final Function<A, A> downstreamFinisher = (Function<A, A>) downstream.finisher();
+        final Function<SparseArray<A>, SparseArray<D>> finisher = intermediate -> {
+            SparseArrayCompat.replaceAll(intermediate, (k, v) -> downstreamFinisher.apply(v));
+            //noinspection unchecked
+            return (SparseArray<D>) intermediate;
+        };
+
+        return new CollectorImpl<>(
+                SparseArray::new,
+                accumulator,
+                finisher
+        );
+    }
+
+    public static <T> Collector<T, ?, SparseArray<List<T>>> groupingInSparseArray(ToIntFunction<? super T> classifier) {
+        return groupingInSparseArray(classifier, toList());
+    }
+
+    public static <T, A, D> Collector<T, ?, LongSparseArray<D>> groupingInLongSparseArray(ToLongFunction<? super T> classifier, Collector<? super T, A, D> downstream) {
+
+        final Supplier<A> downstreamSupplier = downstream.supplier();
+        final BiConsumer<A, ? super T> downstreamAccumulator = downstream.accumulator();
+        final BiConsumer<LongSparseArray<A>, T> accumulator = (m, t) -> {
+            final long key = classifier.apply(t);
+            A container = LongSparseArrayCompat.computeIfAbsent(m, key, k -> downstreamSupplier.get());
+            downstreamAccumulator.accept(container, t);
+        };
+
+        @SuppressWarnings("unchecked")
+        final Function<A, A> downstreamFinisher = (Function<A, A>) downstream.finisher();
+        final Function<LongSparseArray<A>, LongSparseArray<D>> finisher = intermediate -> {
+            LongSparseArrayCompat.replaceAll(intermediate, (k, v) -> downstreamFinisher.apply(v));
+            //noinspection unchecked
+            return (LongSparseArray<D>) intermediate;
+        };
+
+        return new CollectorImpl<>(
+                LongSparseArray::new,
+                accumulator,
+                finisher
+        );
+    }
+
+    public static <T> Collector<T, ?, LongSparseArray<List<T>>> groupingInLongSparseArray(ToLongFunction<? super T> classifier) {
+        return groupingInLongSparseArray(classifier, toList());
     }
 
     public static <T, A, R> Collector<T, A, R> create(Supplier<A> supplier, BiConsumer<A, T> accumulator, Function<A, R> finisher) {
