@@ -10,6 +10,7 @@ import com.github.wrdlbrnft.streamcompat.function.Function;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
 import com.github.wrdlbrnft.streamcompat.function.ToIntFunction;
 import com.github.wrdlbrnft.streamcompat.function.ToLongFunction;
+import com.github.wrdlbrnft.streamcompat.util.Counter;
 import com.github.wrdlbrnft.streamcompat.util.LongSparseArrayCompat;
 import com.github.wrdlbrnft.streamcompat.util.MapCompat;
 import com.github.wrdlbrnft.streamcompat.util.SparseArrayCompat;
@@ -73,6 +74,14 @@ public class Collectors {
                 HashSet::new,
                 Set::add,
                 i -> i
+        );
+    }
+
+    public static <T> Collector<T, ?, Long> toCount() {
+        return new CollectorImpl<>(
+                Counter::new,
+                (c, t) -> c.increment(),
+                Counter::getCount
         );
     }
 
