@@ -23,6 +23,9 @@ import com.github.wrdlbrnft.streamcompat.iterator.DoubleIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.FloatIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.IntIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.LongIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.base.concat.BaseConcatIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.base.concat.ChildHandler;
+import com.github.wrdlbrnft.streamcompat.iterator.base.concat.DataSource;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStream;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStreamCompat;
 import com.github.wrdlbrnft.streamcompat.util.Optional;
@@ -94,8 +97,12 @@ class StreamImpl<T> implements Stream<T> {
     @Override
     public <R> Stream<R> flatMap(Function<T, ? extends Stream<? extends R>> mapper) {
         Utils.requireNonNull(mapper);
-        final Iterator<R> iterator = new FlatMappingIterator<>(mIterator, mapper);
-        return new StreamImpl<>(iterator);
+        return new StreamImpl<>(new BaseConcatIterator<>(
+                DataSource.of(mIterator),
+                t -> mapper.apply(t).iterator(),
+                ChildHandler.forIterator(),
+                Utils::emptyIterator
+        ));
     }
 
     @Override

@@ -25,4 +25,17 @@ public class StreamTests {
 
         Assert.assertEquals(1L, array.get('a').longValue());
     }
+
+    @Test
+    public void testConcat() {
+        final long count = StreamCompat.concat(
+                StreamCompat.of("ASDF", "test", "wwq    wew", "z"),
+                StreamCompat.of("qqq", "sdalgekasdgkl"),
+                StreamCompat.of("q[rgeeu0", "zflb;ndz"))
+                .flatMapToChar(text -> CharacterStreamCompat.of(text.toCharArray()))
+                .filter(c -> c == 'q')
+                .count();
+
+        Assert.assertEquals(5L, count);
+    }
 }

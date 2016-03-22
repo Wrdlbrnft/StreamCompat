@@ -11,4 +11,6 @@ public abstract class BaseDoubleIterator extends BaseIterator<Double> implements
     public final Double next() {
         return nextDouble();
     }
+
+
 }

@@ -2,6 +2,7 @@ package com.github.wrdlbrnft.streamcompat.characterstream;
 
 import com.github.wrdlbrnft.streamcompat.iterator.CharArrayIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.CharIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.base.CharIteratorImpl;
 
 /**
  * Created by kapeller on 21/03/16.

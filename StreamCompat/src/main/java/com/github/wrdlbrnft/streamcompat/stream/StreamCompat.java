@@ -5,13 +5,35 @@ import com.github.wrdlbrnft.streamcompat.iterator.DoubleArrayIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.FloatArrayIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.IntArrayIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.LongArrayIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.base.concat.BaseConcatIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.base.concat.ChildHandler;
+import com.github.wrdlbrnft.streamcompat.iterator.base.concat.DataSource;
+import com.github.wrdlbrnft.streamcompat.util.Utils;
 
+import java.util.Collections;
 import java.util.Iterator;
 
 /**
  * Created by kapeller on 10/03/16.
  */
 public class StreamCompat {
+
+    private static final Stream<?> EMPTY_STREAM = new StreamImpl<>(Collections.emptyList().iterator());
+
+    @SuppressWarnings("unchecked")
+    public static <S> Stream<S> empty() {
+        return (Stream<S>) EMPTY_STREAM;
+    }
+
+    @SafeVarargs
+    public static <S> Stream<S> concat(Stream<S>... streams) {
+        return new StreamImpl<>(new BaseConcatIterator<>(
+                DataSource.of(streams),
+                Stream::iterator,
+                ChildHandler.forIterator(),
+                Utils::emptyIterator
+        ));
+    }
 
     public static <S> Stream<S> of(Iterable<S> collection) {
         final Iterator<S> iterator = new ImmutableIterator<>(collection.iterator());
