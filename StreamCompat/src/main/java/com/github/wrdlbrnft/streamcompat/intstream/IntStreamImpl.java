@@ -1,7 +1,7 @@
 package com.github.wrdlbrnft.streamcompat.intstream;
 
-import com.github.wrdlbrnft.streamcompat.charstream.CharStream;
-import com.github.wrdlbrnft.streamcompat.charstream.CharStreamCompat;
+import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStream;
+import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStreamCompat;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStream;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStreamCompat;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStream;
@@ -92,10 +92,10 @@ class IntStreamImpl implements IntStream {
     }
 
     @Override
-    public CharStream mapToChar(IntToCharFunction mapper) {
+    public CharacterStream mapToChar(IntToCharFunction mapper) {
         Utils.requireNonNull(mapper);
         final CharIterator iterator = new IntToCharMappingIterator(mIterator, mapper);
-        return CharStreamCompat.of(iterator);
+        return CharacterStreamCompat.of(iterator);
     }
 
     @Override

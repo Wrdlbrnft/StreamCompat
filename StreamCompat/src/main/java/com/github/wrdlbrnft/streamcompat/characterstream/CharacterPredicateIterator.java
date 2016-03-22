@@ -1,4 +1,4 @@
-package com.github.wrdlbrnft.streamcompat.charstream;
+package com.github.wrdlbrnft.streamcompat.characterstream;
 
 import com.github.wrdlbrnft.streamcompat.function.CharPredicate;
 import com.github.wrdlbrnft.streamcompat.iterator.CharIterator;
@@ -9,14 +9,14 @@ import java.util.NoSuchElementException;
 /**
  * Created by kapeller on 10/03/16.
  */
-class CharPredicateIterator extends BaseCharIterator implements CharIterator {
+class CharacterPredicateIterator extends BaseCharIterator implements CharIterator {
 
     private final CharIterator mBaseIterator;
     private final CharPredicate mPredicate;
     private char mNext;
     private boolean mHasNext;
 
-    CharPredicateIterator(CharIterator baseIterator, CharPredicate predicate) {
+    CharacterPredicateIterator(CharIterator baseIterator, CharPredicate predicate) {
         mBaseIterator = baseIterator;
         mPredicate = predicate;
         moveToNext();

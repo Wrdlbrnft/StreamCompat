@@ -1,7 +1,7 @@
 package com.github.wrdlbrnft.streamcompat.floatstream;
 
-import com.github.wrdlbrnft.streamcompat.charstream.CharStream;
-import com.github.wrdlbrnft.streamcompat.charstream.CharStreamCompat;
+import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStream;
+import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStreamCompat;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStream;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStreamCompat;
 import com.github.wrdlbrnft.streamcompat.function.FloatBinaryOperator;
@@ -85,10 +85,10 @@ class FloatStreamImpl implements FloatStream {
     }
 
     @Override
-    public CharStream mapToChar(FloatToCharFunction mapper) {
+    public CharacterStream mapToChar(FloatToCharFunction mapper) {
         Utils.requireNonNull(mapper);
         final CharIterator iterator = new FloatToCharMappingIterator(mIterator, mapper);
-        return CharStreamCompat.of(iterator);
+        return CharacterStreamCompat.of(iterator);
     }
 
     @Override

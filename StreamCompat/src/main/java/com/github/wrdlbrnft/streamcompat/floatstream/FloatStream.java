@@ -1,6 +1,6 @@
 package com.github.wrdlbrnft.streamcompat.floatstream;
 
-import com.github.wrdlbrnft.streamcompat.charstream.CharStream;
+import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStream;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStream;
 import com.github.wrdlbrnft.streamcompat.function.FloatBinaryOperator;
 import com.github.wrdlbrnft.streamcompat.function.FloatFunction;
@@ -28,7 +28,7 @@ public interface FloatStream extends Iterable<Float> {
     <U> Stream<U> mapToObj(FloatFunction<? extends U> mapper);
     LongStream mapToLong(FloatToLongFunction mapper);
     IntStream mapToInt(FloatToIntFunction mapper);
-    CharStream mapToChar(FloatToCharFunction mapper);
+    CharacterStream mapToChar(FloatToCharFunction mapper);
     DoubleStream mapToDouble(FloatToDoubleFunction mapper);
     Stream<Float> boxed();
     FloatStream limit(long limit);

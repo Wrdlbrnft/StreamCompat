@@ -1,7 +1,7 @@
 package com.github.wrdlbrnft.streamcompat.doublestream;
 
-import com.github.wrdlbrnft.streamcompat.charstream.CharStream;
-import com.github.wrdlbrnft.streamcompat.charstream.CharStreamCompat;
+import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStream;
+import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStreamCompat;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStream;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStreamCompat;
 import com.github.wrdlbrnft.streamcompat.function.DoubleBinaryOperator;
@@ -92,10 +92,10 @@ class DoubleStreamImpl implements DoubleStream {
     }
 
     @Override
-    public CharStream mapToChar(DoubleToCharFunction mapper) {
+    public CharacterStream mapToChar(DoubleToCharFunction mapper) {
         Utils.requireNonNull(mapper);
         final CharIterator iterator = new DoubleToCharMappingIterator(mIterator, mapper);
-        return CharStreamCompat.of(iterator);
+        return CharacterStreamCompat.of(iterator);
     }
 
     @Override

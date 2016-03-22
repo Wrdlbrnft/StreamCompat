@@ -1,4 +1,4 @@
-package com.github.wrdlbrnft.streamcompat.charstream;
+package com.github.wrdlbrnft.streamcompat.characterstream;
 
 import com.github.wrdlbrnft.streamcompat.iterator.CharIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.base.BaseCharIterator;
@@ -6,13 +6,13 @@ import com.github.wrdlbrnft.streamcompat.iterator.base.BaseCharIterator;
 /**
  * Created by kapeller on 21/03/16.
  */
-class CharLimitIterator extends BaseCharIterator implements CharIterator {
+class CharacterLimitIterator extends BaseCharIterator implements CharIterator {
 
     private final CharIterator mIterator;
     private final long mLimit;
     private long mIndex = 0;
 
-    public CharLimitIterator(CharIterator iterator, long limit) {
+    public CharacterLimitIterator(CharIterator iterator, long limit) {
         mIterator = iterator;
         mLimit = limit;
     }

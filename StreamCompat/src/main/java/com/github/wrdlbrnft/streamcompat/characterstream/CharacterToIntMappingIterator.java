@@ -1,4 +1,4 @@
-package com.github.wrdlbrnft.streamcompat.charstream;
+package com.github.wrdlbrnft.streamcompat.characterstream;
 
 import com.github.wrdlbrnft.streamcompat.function.CharToIntFunction;
 import com.github.wrdlbrnft.streamcompat.iterator.CharIterator;
@@ -7,12 +7,12 @@ import com.github.wrdlbrnft.streamcompat.iterator.base.BaseIntIterator;
 /**
  * Created by kapeller on 21/03/16.
  */
-class CharToIntMappingIterator extends BaseIntIterator {
+class CharacterToIntMappingIterator extends BaseIntIterator {
 
     private final CharIterator mIterator;
     private final CharToIntFunction mMapper;
 
-    CharToIntMappingIterator(CharIterator iterator, CharToIntFunction mapper) {
+    CharacterToIntMappingIterator(CharIterator iterator, CharToIntFunction mapper) {
         mIterator = iterator;
         mMapper = mapper;
     }

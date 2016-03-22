@@ -1,6 +1,6 @@
 package com.github.wrdlbrnft.streamcompat.stream;
 
-import com.github.wrdlbrnft.streamcompat.charstream.CharStream;
+import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStream;
 import com.github.wrdlbrnft.streamcompat.function.Function;
 import com.github.wrdlbrnft.streamcompat.iterator.CharIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.base.BaseCharIterator;
@@ -14,13 +14,13 @@ import java.util.NoSuchElementException;
 class FlatMapToCharIterator<I> extends BaseCharIterator {
 
     private final Iterator<I> mBaseIterator;
-    private final Function<? super I, ? extends CharStream> mMapper;
+    private final Function<? super I, ? extends CharacterStream> mMapper;
 
     private CharIterator mChild = null;
     private boolean mHasNext;
     private char mNext;
 
-    public FlatMapToCharIterator(Iterator<I> iterator, Function<? super I, ? extends CharStream> mapper) {
+    public FlatMapToCharIterator(Iterator<I> iterator, Function<? super I, ? extends CharacterStream> mapper) {
         mBaseIterator = iterator;
         mMapper = mapper;
         moveToNext();
@@ -37,7 +37,7 @@ class FlatMapToCharIterator<I> extends BaseCharIterator {
 
         while (mBaseIterator.hasNext()) {
             final I input = mBaseIterator.next();
-            final CharStream stream = mMapper.apply(input);
+            final CharacterStream stream = mMapper.apply(input);
             mChild = stream.iterator();
             if (mChild != null && mChild.hasNext()) {
                 mHasNext = true;

@@ -1,4 +1,4 @@
-package com.github.wrdlbrnft.streamcompat.charstream;
+package com.github.wrdlbrnft.streamcompat.characterstream;
 
 import com.github.wrdlbrnft.streamcompat.function.CharFunction;
 import com.github.wrdlbrnft.streamcompat.iterator.CharIterator;
@@ -9,16 +9,16 @@ import java.util.NoSuchElementException;
 /**
  * Created by kapeller on 10/03/16.
  */
-class CharFlatMappingIterator extends BaseCharIterator implements CharIterator {
+class CharacterFlatMappingIterator extends BaseCharIterator implements CharIterator {
 
     private final CharIterator mBaseIterator;
-    private final CharFunction<? extends CharStream> mMapper;
+    private final CharFunction<? extends CharacterStream> mMapper;
 
     private CharIterator mChild = null;
     private boolean mHasNext;
     private char mNext;
 
-    public CharFlatMappingIterator(CharIterator iterator, CharFunction<? extends CharStream> mapper) {
+    public CharacterFlatMappingIterator(CharIterator iterator, CharFunction<? extends CharacterStream> mapper) {
         mBaseIterator = iterator;
         mMapper = mapper;
         moveToNext();
@@ -35,7 +35,7 @@ class CharFlatMappingIterator extends BaseCharIterator implements CharIterator {
 
         while (mBaseIterator.hasNext()) {
             final char input = mBaseIterator.nextChar();
-            final CharStream stream = mMapper.apply(input);
+            final CharacterStream stream = mMapper.apply(input);
             mChild = stream.iterator();
             if (mChild != null && mChild.hasNext()) {
                 mHasNext = true;

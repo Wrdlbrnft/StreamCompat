@@ -1,4 +1,4 @@
-package com.github.wrdlbrnft.streamcompat.charstream;
+package com.github.wrdlbrnft.streamcompat.characterstream;
 
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStream;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStreamCompat;
@@ -25,7 +25,7 @@ import com.github.wrdlbrnft.streamcompat.longstream.LongStream;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStreamCompat;
 import com.github.wrdlbrnft.streamcompat.stream.Stream;
 import com.github.wrdlbrnft.streamcompat.stream.StreamCompat;
-import com.github.wrdlbrnft.streamcompat.util.OptionalChar;
+import com.github.wrdlbrnft.streamcompat.util.OptionalCharacter;
 import com.github.wrdlbrnft.streamcompat.util.OptionalDouble;
 import com.github.wrdlbrnft.streamcompat.util.Utils;
 
@@ -34,67 +34,67 @@ import java.util.Iterator;
 /**
  * Created by kapeller on 21/03/16.
  */
-class CharStreamImpl implements CharStream {
+class CharacterStreamImpl implements CharacterStream {
 
     private final CharIterator mIterator;
 
-    CharStreamImpl(CharIterator iterator) {
+    CharacterStreamImpl(CharIterator iterator) {
         mIterator = iterator;
     }
 
     @Override
-    public CharStream filter(CharPredicate predicate) {
+    public CharacterStream filter(CharPredicate predicate) {
         Utils.requireNonNull(predicate);
-        final CharIterator iterator = new CharPredicateIterator(mIterator, predicate);
-        return new CharStreamImpl(iterator);
+        final CharIterator iterator = new CharacterPredicateIterator(mIterator, predicate);
+        return new CharacterStreamImpl(iterator);
     }
 
     @Override
-    public CharStream map(CharUnaryOperator mapper) {
+    public CharacterStream map(CharUnaryOperator mapper) {
         Utils.requireNonNull(mapper);
-        final CharIterator iterator = new CharMappingIterator(mIterator, mapper);
-        return new CharStreamImpl(iterator);
+        final CharIterator iterator = new CharacterMappingIterator(mIterator, mapper);
+        return new CharacterStreamImpl(iterator);
     }
 
     @Override
-    public CharStream flatMap(CharFunction<? extends CharStream> mapper) {
+    public CharacterStream flatMap(CharFunction<? extends CharacterStream> mapper) {
         Utils.requireNonNull(mapper);
-        final CharIterator iterator = new CharFlatMappingIterator(mIterator, mapper);
-        return new CharStreamImpl(iterator);
+        final CharIterator iterator = new CharacterFlatMappingIterator(mIterator, mapper);
+        return new CharacterStreamImpl(iterator);
     }
 
     @Override
     public <U> Stream<U> mapToObj(CharFunction<? extends U> mapper) {
         Utils.requireNonNull(mapper);
-        final Iterator<U> iterator = new CharToObjectMappingIterator<>(mIterator, mapper);
+        final Iterator<U> iterator = new CharacterToObjectMappingIterator<>(mIterator, mapper);
         return StreamCompat.of(iterator);
     }
 
     @Override
     public LongStream mapToLong(CharToLongFunction mapper) {
         Utils.requireNonNull(mapper);
-        final LongIterator iterator = new CharToLongMappingIterator(mIterator, mapper);
+        final LongIterator iterator = new CharacterToLongMappingIterator(mIterator, mapper);
         return LongStreamCompat.of(iterator);
     }
 
     @Override
     public IntStream mapToInt(CharToIntFunction mapper) {
         Utils.requireNonNull(mapper);
-        final IntIterator iterator = new CharToIntMappingIterator(mIterator, mapper);
+        final IntIterator iterator = new CharacterToIntMappingIterator(mIterator, mapper);
         return IntStreamCompat.of(iterator);
     }
 
     @Override
     public DoubleStream mapToDouble(CharToDoubleFunction mapper) {
         Utils.requireNonNull(mapper);
-        final DoubleIterator iterator = new CharToDoubleMappingIterator(mIterator, mapper);
+        final DoubleIterator iterator = new CharacterToDoubleMappingIterator(mIterator, mapper);
         return DoubleStreamCompat.of(iterator);
     }
 
     @Override
     public FloatStream mapToFloat(CharToFloatFunction mapper) {
         Utils.requireNonNull(mapper);
-        final FloatIterator iterator = new CharToFloatMappingIterator(mIterator, mapper);
+        final FloatIterator iterator = new CharacterToFloatMappingIterator(mIterator, mapper);
         return FloatStreamCompat.of(iterator);
     }
 
@@ -109,9 +109,9 @@ class CharStreamImpl implements CharStream {
     }
 
     @Override
-    public CharStream limit(long limit) {
-        final CharIterator iterator = new CharLimitIterator(mIterator, limit);
-        return new CharStreamImpl(iterator);
+    public CharacterStream limit(long limit) {
+        final CharIterator iterator = new CharacterLimitIterator(mIterator, limit);
+        return new CharacterStreamImpl(iterator);
     }
 
     @Override
@@ -125,17 +125,17 @@ class CharStreamImpl implements CharStream {
     }
 
     @Override
-    public OptionalChar reduce(CharBinaryOperator accumulator) {
+    public OptionalCharacter reduce(CharBinaryOperator accumulator) {
         Utils.requireNonNull(accumulator);
         if (!mIterator.hasNext()) {
-            return OptionalChar.empty();
+            return OptionalCharacter.empty();
         }
 
         char current = mIterator.nextChar();
         while (mIterator.hasNext()) {
             current = accumulator.applyAsChar(current, mIterator.nextChar());
         }
-        return OptionalChar.of(current);
+        return OptionalCharacter.of(current);
     }
 
     @Override
@@ -156,12 +156,12 @@ class CharStreamImpl implements CharStream {
     }
 
     @Override
-    public OptionalChar min() {
+    public OptionalCharacter min() {
         return reduce((a, b) -> a < b ? a : b);
     }
 
     @Override
-    public OptionalChar max() {
+    public OptionalCharacter max() {
         return reduce((a, b) -> a < b ? b : a);
     }
 
@@ -184,10 +184,10 @@ class CharStreamImpl implements CharStream {
     }
 
     @Override
-    public OptionalChar findFirst() {
+    public OptionalCharacter findFirst() {
         return mIterator.hasNext()
-                ? OptionalChar.of(mIterator.nextChar())
-                : OptionalChar.empty();
+                ? OptionalCharacter.of(mIterator.nextChar())
+                : OptionalCharacter.empty();
     }
 
     @Override

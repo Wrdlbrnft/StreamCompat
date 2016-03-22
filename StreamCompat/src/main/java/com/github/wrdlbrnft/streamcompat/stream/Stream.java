@@ -1,6 +1,6 @@
 package com.github.wrdlbrnft.streamcompat.stream;
 
-import com.github.wrdlbrnft.streamcompat.charstream.CharStream;
+import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStream;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStream;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStream;
 import com.github.wrdlbrnft.streamcompat.function.BinaryOperator;
@@ -27,17 +27,18 @@ public interface Stream<T> extends Iterable<T> {
     LongStream mapToLong(ToLongFunction<? super T> mapper);
     DoubleStream mapToDouble(ToDoubleFunction<? super T> mapper);
     FloatStream mapToFloat(ToFloatFunction<? super T> mapper);
-    CharStream mapToChar(ToCharFunction<? super T> mapper);
+    CharacterStream mapToChar(ToCharFunction<? super T> mapper);
     <R> Stream<R> flatMap(Function<T, ? extends Stream<? extends R>> mapper);
     IntStream flatMapToInt(Function<? super T, ? extends IntStream> mapper);
     LongStream flatMapToLong(Function<? super T, ? extends LongStream> mapper);
     FloatStream flatMapToFloat(Function<? super T, ? extends FloatStream> mapper);
     DoubleStream flatMapToDouble(Function<? super T, ? extends DoubleStream> mapper);
-    CharStream flatMapToChar(Function<? super T, ? extends CharStream> mapper);
+    CharacterStream flatMapToChar(Function<? super T, ? extends CharacterStream> mapper);
     <A, R> R collect(Collector<T, A, R> function);
     Stream<T> limit(long count);
     Optional<T> reduce(BinaryOperator<T> accumulator);
     T reduce(T identity, BinaryOperator<T> accumulator);
+    <U> U reduce(U identity, Function<? super T, ? extends U> mapper, BinaryOperator<U> accumulator);
     Optional<T> min(Comparator<? super T> comparator);
     Optional<T> max(Comparator<? super T> comparator);
     long count();

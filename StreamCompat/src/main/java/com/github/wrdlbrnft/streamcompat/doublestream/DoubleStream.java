@@ -1,6 +1,6 @@
 package com.github.wrdlbrnft.streamcompat.doublestream;
 
-import com.github.wrdlbrnft.streamcompat.charstream.CharStream;
+import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStream;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStream;
 import com.github.wrdlbrnft.streamcompat.function.DoubleBinaryOperator;
 import com.github.wrdlbrnft.streamcompat.function.DoubleFunction;
@@ -10,9 +10,7 @@ import com.github.wrdlbrnft.streamcompat.function.DoubleToFloatFunction;
 import com.github.wrdlbrnft.streamcompat.function.DoubleToIntFunction;
 import com.github.wrdlbrnft.streamcompat.function.DoubleToLongFunction;
 import com.github.wrdlbrnft.streamcompat.function.DoubleUnaryOperator;
-import com.github.wrdlbrnft.streamcompat.function.IntBinaryOperator;
 import com.github.wrdlbrnft.streamcompat.function.ObjDoubleConsumer;
-import com.github.wrdlbrnft.streamcompat.function.ObjIntConsumer;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStream;
 import com.github.wrdlbrnft.streamcompat.iterator.DoubleIterator;
@@ -31,7 +29,7 @@ public interface DoubleStream extends Iterable<Double> {
     LongStream mapToLong(DoubleToLongFunction mapper);
     FloatStream mapToFloat(DoubleToFloatFunction mapper);
     IntStream mapToInt(DoubleToIntFunction mapper);
-    CharStream mapToChar(DoubleToCharFunction mapper);
+    CharacterStream mapToChar(DoubleToCharFunction mapper);
     Stream<Double> boxed();
     DoubleStream limit(long limit);
     double reduce(double identity, DoubleBinaryOperator op);

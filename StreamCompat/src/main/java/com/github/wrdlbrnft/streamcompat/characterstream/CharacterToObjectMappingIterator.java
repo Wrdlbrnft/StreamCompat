@@ -1,4 +1,4 @@
-package com.github.wrdlbrnft.streamcompat.charstream;
+package com.github.wrdlbrnft.streamcompat.characterstream;
 
 import com.github.wrdlbrnft.streamcompat.function.CharFunction;
 import com.github.wrdlbrnft.streamcompat.iterator.CharIterator;
@@ -9,12 +9,12 @@ import java.util.Iterator;
 /**
  * Created by kapeller on 10/03/16.
  */
-class CharToObjectMappingIterator<O> extends BaseIterator<O> implements Iterator<O> {
+class CharacterToObjectMappingIterator<O> extends BaseIterator<O> implements Iterator<O> {
 
     private final CharIterator mBaseIterator;
     private final CharFunction<? extends O> mMapper;
 
-    public CharToObjectMappingIterator(CharIterator iterator, CharFunction<? extends O> mapper) {
+    public CharacterToObjectMappingIterator(CharIterator iterator, CharFunction<? extends O> mapper) {
         mBaseIterator = iterator;
         mMapper = mapper;
     }

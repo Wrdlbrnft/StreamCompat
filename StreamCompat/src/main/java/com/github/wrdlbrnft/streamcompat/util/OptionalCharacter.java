@@ -6,32 +6,32 @@ import com.github.wrdlbrnft.streamcompat.function.Supplier;
 
 import java.util.NoSuchElementException;
 
-public class OptionalChar {
+public class OptionalCharacter {
 
-    private static final OptionalChar EMPTY = new OptionalChar();
+    private static final OptionalCharacter EMPTY = new OptionalCharacter();
     
     private final boolean mIsPresent;
     private final char mValue;
 
-    private OptionalChar() {
+    private OptionalCharacter() {
         mIsPresent = false;
         mValue = 0;
     }
     
-    public static OptionalChar empty() {
+    public static OptionalCharacter empty() {
         return EMPTY;
     }
     
-    private OptionalChar(char value) {
+    private OptionalCharacter(char value) {
         mIsPresent = true;
         mValue = value;
     }
     
-    public static OptionalChar of(char value) {
-        return new OptionalChar(value);
+    public static OptionalCharacter of(char value) {
+        return new OptionalCharacter(value);
     }
     
-    public char getAsChar() {
+    public char getAsCharacter() {
         if (!mIsPresent) {
             throw new NoSuchElementException("No value present");
         }
@@ -70,11 +70,11 @@ public class OptionalChar {
             return true;
         }
 
-        if (!(obj instanceof OptionalChar)) {
+        if (!(obj instanceof OptionalCharacter)) {
             return false;
         }
 
-        OptionalChar other = (OptionalChar) obj;
+        OptionalCharacter other = (OptionalCharacter) obj;
         return (mIsPresent && other.mIsPresent)
                 ? mValue == other.mValue
                 : mIsPresent == other.mIsPresent;

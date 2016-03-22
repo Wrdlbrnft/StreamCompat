@@ -1,6 +1,6 @@
 package com.github.wrdlbrnft.streamcompat.intstream;
 
-import com.github.wrdlbrnft.streamcompat.charstream.CharStream;
+import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStream;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStream;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStream;
 import com.github.wrdlbrnft.streamcompat.function.IntBinaryOperator;
@@ -30,7 +30,7 @@ public interface IntStream extends Iterable<Integer> {
     LongStream mapToLong(IntToLongFunction mapper);
     DoubleStream mapToDouble(IntToDoubleFunction mapper);
     FloatStream mapToFloat(IntToFloatFunction mapper);
-    CharStream mapToChar(IntToCharFunction mapper);
+    CharacterStream mapToChar(IntToCharFunction mapper);
     Stream<Integer> boxed();
     IntStream limit(long limit);
     int reduce(int identity, IntBinaryOperator op);

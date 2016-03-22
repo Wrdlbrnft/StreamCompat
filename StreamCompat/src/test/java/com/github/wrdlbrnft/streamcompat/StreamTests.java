@@ -1,6 +1,6 @@
 package com.github.wrdlbrnft.streamcompat;
 
-import com.github.wrdlbrnft.streamcompat.charstream.CharStreamCompat;
+import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStreamCompat;
 import com.github.wrdlbrnft.streamcompat.stream.StreamCompat;
 
 import org.junit.Assert;
@@ -14,7 +14,7 @@ public class StreamTests {
     @Test
     public void testBasicIntStream() {
         final long result = StreamCompat.of("ASDF", "test", "wwwew", "z", "qqq", "sdalgekasdgkl", "q[rgeeu0", "zflb;ndz")
-                .flatMapToChar(text -> CharStreamCompat.of(text.toCharArray()))
+                .flatMapToChar(text -> CharacterStreamCompat.of(text.toCharArray()))
                 .filter(c -> c == 'e')
                 .count();
 

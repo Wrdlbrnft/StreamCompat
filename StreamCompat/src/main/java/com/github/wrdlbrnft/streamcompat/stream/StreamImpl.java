@@ -1,7 +1,7 @@
 package com.github.wrdlbrnft.streamcompat.stream;
 
-import com.github.wrdlbrnft.streamcompat.charstream.CharStream;
-import com.github.wrdlbrnft.streamcompat.charstream.CharStreamCompat;
+import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStream;
+import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStreamCompat;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStream;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStreamCompat;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStream;
@@ -83,10 +83,10 @@ class StreamImpl<T> implements Stream<T> {
     }
 
     @Override
-    public CharStream mapToChar(ToCharFunction<? super T> mapper) {
+    public CharacterStream mapToChar(ToCharFunction<? super T> mapper) {
         Utils.requireNonNull(mapper);
         final CharIterator iterator = new MapToCharIterator<>(mIterator, mapper);
-        return CharStreamCompat.of(iterator);
+        return CharacterStreamCompat.of(iterator);
     }
 
     @Override
@@ -125,10 +125,10 @@ class StreamImpl<T> implements Stream<T> {
     }
 
     @Override
-    public CharStream flatMapToChar(Function<? super T, ? extends CharStream> mapper) {
+    public CharacterStream flatMapToChar(Function<? super T, ? extends CharacterStream> mapper) {
         Utils.requireNonNull(mapper);
         final CharIterator iterator = new FlatMapToCharIterator<>(mIterator, mapper);
-        return CharStreamCompat.of(iterator);
+        return CharacterStreamCompat.of(iterator);
     }
 
     @Override
@@ -151,23 +151,26 @@ class StreamImpl<T> implements Stream<T> {
 
     @Override
     public Optional<T> reduce(BinaryOperator<T> accumulator) {
-        Utils.requireNonNull(accumulator);
-
-        T current = mIterator.hasNext() ? mIterator.next() : null;
-        while (mIterator.hasNext()) {
-            current = accumulator.apply(current, mIterator.next());
+        if (!mIterator.hasNext()) {
+            return Optional.empty();
         }
 
-        return Optional.of(current);
+        return Optional.of(reduce(mIterator.next(), accumulator));
     }
 
     @Override
     public T reduce(T identity, BinaryOperator<T> accumulator) {
+        return reduce(identity, i -> i, accumulator);
+    }
+
+    @Override
+    public <U> U reduce(U identity, Function<? super T, ? extends U> mapper, BinaryOperator<U> accumulator) {
+        Utils.requireNonNull(mapper);
         Utils.requireNonNull(accumulator);
 
-        T current = identity;
+        U current = identity;
         while (mIterator.hasNext()) {
-            current = accumulator.apply(current, mIterator.next());
+            current = accumulator.apply(current, mapper.apply(mIterator.next()));
         }
 
         return current;
