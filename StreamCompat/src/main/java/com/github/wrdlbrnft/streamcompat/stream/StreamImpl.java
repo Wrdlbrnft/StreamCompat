@@ -6,9 +6,11 @@ import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStream;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStreamCompat;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStream;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStreamCompat;
+import com.github.wrdlbrnft.streamcompat.function.BiConsumer;
 import com.github.wrdlbrnft.streamcompat.function.BinaryOperator;
 import com.github.wrdlbrnft.streamcompat.function.Function;
 import com.github.wrdlbrnft.streamcompat.function.Predicate;
+import com.github.wrdlbrnft.streamcompat.function.Supplier;
 import com.github.wrdlbrnft.streamcompat.function.ToCharFunction;
 import com.github.wrdlbrnft.streamcompat.function.ToDoubleFunction;
 import com.github.wrdlbrnft.streamcompat.function.ToFloatFunction;
@@ -132,7 +134,7 @@ class StreamImpl<T> implements Stream<T> {
     }
 
     @Override
-    public <A, R> R collect(Collector<T, A, R> function) {
+    public <R, A> R collect(Collector<? super T, A, R> function) {
         Utils.requireNonNull(function);
         final A result = function.supplier().get();
 
@@ -141,6 +143,15 @@ class StreamImpl<T> implements Stream<T> {
         }
 
         return function.finisher().apply(result);
+    }
+
+    @Override
+    public <R> R collect(Supplier<R> supplier, BiConsumer<R, ? super T> accumulator) {
+        final R result = Utils.requireNonNull(supplier).get();
+        while (mIterator.hasNext()) {
+            accumulator.accept(result, mIterator.next());
+        }
+        return result;
     }
 
     @Override
