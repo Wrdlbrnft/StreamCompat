@@ -13,7 +13,7 @@ public class LongStreamCompat {
         return new LongStreamImpl(iterator);
     }
 
-    public static LongStream range(int start, int end) {
+    public static LongStream range(long start, long end) {
         if (end < start) {
             throw new IllegalArgumentException("End value must be bigger than start value!");
         }
