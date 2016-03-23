@@ -13,7 +13,7 @@ import com.github.wrdlbrnft.streamcompat.function.FloatUnaryOperator;
 import com.github.wrdlbrnft.streamcompat.function.ObjFloatConsumer;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStream;
-import com.github.wrdlbrnft.streamcompat.iterator.FloatIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.primtive.FloatIterator;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStream;
 import com.github.wrdlbrnft.streamcompat.stream.Stream;
 import com.github.wrdlbrnft.streamcompat.util.OptionalFloat;

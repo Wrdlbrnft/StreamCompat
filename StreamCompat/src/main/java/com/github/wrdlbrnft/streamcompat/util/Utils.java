@@ -1,29 +1,13 @@
 package com.github.wrdlbrnft.streamcompat.util;
 
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 /**
  * Created by kapeller on 10/03/16.
  */
 public class Utils {
 
-    private static final Iterator<?> EMPTY_ITERATOR = new Iterator<Object>() {
-        @Override
-        public boolean hasNext() {
-            return false;
-        }
-
-        @Override
-        public Object next() {
-            throw new NoSuchElementException();
-        }
-
-        @Override
-        public void remove() {
-            throw new IllegalStateException();
-        }
-    };
+    private static final Iterator<?> EMPTY_ITERATOR = new EmptyIterator<>();
 
     public static <T> T requireNonNull(T object) {
         if (object == null) {

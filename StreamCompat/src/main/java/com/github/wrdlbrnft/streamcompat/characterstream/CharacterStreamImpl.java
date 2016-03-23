@@ -16,11 +16,14 @@ import com.github.wrdlbrnft.streamcompat.function.ObjCharConsumer;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStream;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStreamCompat;
-import com.github.wrdlbrnft.streamcompat.iterator.CharIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.DoubleIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.FloatIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.IntIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.LongIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.primtive.CharIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.base.BaseIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.CharChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.ChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.DoubleChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.FloatChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.IntChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.LongChildIterator;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStream;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStreamCompat;
 import com.github.wrdlbrnft.streamcompat.stream.Stream;
@@ -28,8 +31,6 @@ import com.github.wrdlbrnft.streamcompat.stream.StreamCompat;
 import com.github.wrdlbrnft.streamcompat.util.OptionalCharacter;
 import com.github.wrdlbrnft.streamcompat.util.OptionalDouble;
 import com.github.wrdlbrnft.streamcompat.util.Utils;
-
-import java.util.Iterator;
 
 /**
  * Created by kapeller on 21/03/16.
@@ -45,57 +46,100 @@ class CharacterStreamImpl implements CharacterStream {
     @Override
     public CharacterStream filter(CharPredicate predicate) {
         Utils.requireNonNull(predicate);
-        final CharIterator iterator = new CharacterPredicateIterator(mIterator, predicate);
-        return new CharacterStreamImpl(iterator);
+        final DummyIterator iterator = new DummyIterator();
+        return new CharacterStreamImpl(new CharChildIterator<>(
+                () -> {
+                    while (mIterator.hasNext()) {
+                        final char c = mIterator.nextChar();
+                        if (predicate.test(c)) {
+                            return iterator.newValue(c);
+                        }
+                    }
+                    return iterator;
+                },
+                CharIterator::hasNext,
+                CharIterator::nextChar
+        ));
     }
 
     @Override
     public CharacterStream map(CharUnaryOperator mapper) {
         Utils.requireNonNull(mapper);
-        final CharIterator iterator = new CharacterMappingIterator(mIterator, mapper);
-        return new CharacterStreamImpl(iterator);
+        return new CharacterStreamImpl(new CharChildIterator<>(
+                () -> mIterator,
+                CharIterator::hasNext,
+                iterator -> mapper.applyAsChar(iterator.nextChar())
+        ));
     }
 
     @Override
     public CharacterStream flatMap(CharFunction<? extends CharacterStream> mapper) {
         Utils.requireNonNull(mapper);
-        final CharIterator iterator = new CharacterFlatMappingIterator(mIterator, mapper);
-        return new CharacterStreamImpl(iterator);
+        final CharIterator[] array = new CharIterator[1];
+        return new CharacterStreamImpl(new CharChildIterator<>(
+                () -> {
+                    if (array[0] == null || !array[0].hasNext()) {
+                        if (!mIterator.hasNext()) {
+                            return array[0] = CharacterStreamCompat.EMPTY_ITERATOR;
+                        }
+                        array[0] = mapper.apply(mIterator.nextChar()).iterator();
+                    }
+
+                    return array[0];
+                },
+                CharIterator::hasNext,
+                CharIterator::nextChar
+        ));
     }
 
     @Override
     public <U> Stream<U> mapToObj(CharFunction<? extends U> mapper) {
         Utils.requireNonNull(mapper);
-        final Iterator<U> iterator = new CharacterToObjectMappingIterator<>(mIterator, mapper);
-        return StreamCompat.of(iterator);
+        return StreamCompat.of(new ChildIterator<>(
+                () -> mIterator,
+                CharIterator::hasNext,
+                iterator -> mapper.apply(mIterator.nextChar())
+        ));
     }
 
     @Override
     public LongStream mapToLong(CharToLongFunction mapper) {
         Utils.requireNonNull(mapper);
-        final LongIterator iterator = new CharacterToLongMappingIterator(mIterator, mapper);
-        return LongStreamCompat.of(iterator);
+        return LongStreamCompat.of(new LongChildIterator<>(
+                () -> mIterator,
+                CharIterator::hasNext,
+                iterator -> mapper.applyAsLong(mIterator.nextChar())
+        ));
     }
 
     @Override
     public IntStream mapToInt(CharToIntFunction mapper) {
         Utils.requireNonNull(mapper);
-        final IntIterator iterator = new CharacterToIntMappingIterator(mIterator, mapper);
-        return IntStreamCompat.of(iterator);
+        return IntStreamCompat.of(new IntChildIterator<>(
+                () -> mIterator,
+                CharIterator::hasNext,
+                iterator -> mapper.applyAsInt(mIterator.nextChar())
+        ));
     }
 
     @Override
     public DoubleStream mapToDouble(CharToDoubleFunction mapper) {
         Utils.requireNonNull(mapper);
-        final DoubleIterator iterator = new CharacterToDoubleMappingIterator(mIterator, mapper);
-        return DoubleStreamCompat.of(iterator);
+        return DoubleStreamCompat.of(new DoubleChildIterator<>(
+                () -> mIterator,
+                CharIterator::hasNext,
+                iterator -> mapper.applyAsDouble(mIterator.nextChar())
+        ));
     }
 
     @Override
     public FloatStream mapToFloat(CharToFloatFunction mapper) {
         Utils.requireNonNull(mapper);
-        final FloatIterator iterator = new CharacterToFloatMappingIterator(mIterator, mapper);
-        return FloatStreamCompat.of(iterator);
+        return FloatStreamCompat.of(new FloatChildIterator<>(
+                () -> mIterator,
+                CharIterator::hasNext,
+                iterator -> mapper.applyAsFloat(mIterator.nextChar())
+        ));
     }
 
     @Override
@@ -110,8 +154,15 @@ class CharacterStreamImpl implements CharacterStream {
 
     @Override
     public CharacterStream limit(long limit) {
-        final CharIterator iterator = new CharacterLimitIterator(mIterator, limit);
-        return new CharacterStreamImpl(iterator);
+        final long[] array = {0, limit};
+        return new CharacterStreamImpl(new CharChildIterator<>(
+                () -> mIterator,
+                i -> array[0] < array[1] && i.hasNext(),
+                i -> {
+                    array[0]++;
+                    return i.nextChar();
+                }
+        ));
     }
 
     @Override
@@ -218,5 +269,46 @@ class CharacterStreamImpl implements CharacterStream {
             }
         }
         return true;
+    }
+
+    private static class DummyIterator extends BaseIterator<Character> implements CharIterator {
+
+        private char mValue;
+        private boolean mHasNext;
+
+        public DummyIterator(char value) {
+            this(value, true);
+        }
+
+        public DummyIterator() {
+            this('a', false);
+        }
+
+        private DummyIterator(char value, boolean hasNext) {
+            mValue = value;
+            mHasNext = hasNext;
+        }
+
+        public DummyIterator newValue(char value) {
+            mValue = value;
+            mHasNext = true;
+            return this;
+        }
+
+        @Override
+        public char nextChar() {
+            mHasNext = false;
+            return mValue;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return mHasNext;
+        }
+
+        @Override
+        public Character next() {
+            return nextChar();
+        }
     }
 }

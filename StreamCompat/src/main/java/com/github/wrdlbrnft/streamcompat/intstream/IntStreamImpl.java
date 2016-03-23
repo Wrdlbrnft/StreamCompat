@@ -16,11 +16,14 @@ import com.github.wrdlbrnft.streamcompat.function.IntToLongFunction;
 import com.github.wrdlbrnft.streamcompat.function.IntUnaryOperator;
 import com.github.wrdlbrnft.streamcompat.function.ObjIntConsumer;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
-import com.github.wrdlbrnft.streamcompat.iterator.CharIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.DoubleIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.FloatIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.IntIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.LongIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.primtive.IntIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.base.BaseIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.CharChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.ChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.DoubleChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.FloatChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.IntChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.LongChildIterator;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStream;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStreamCompat;
 import com.github.wrdlbrnft.streamcompat.stream.Stream;
@@ -28,8 +31,6 @@ import com.github.wrdlbrnft.streamcompat.stream.StreamCompat;
 import com.github.wrdlbrnft.streamcompat.util.OptionalDouble;
 import com.github.wrdlbrnft.streamcompat.util.OptionalInt;
 import com.github.wrdlbrnft.streamcompat.util.Utils;
-
-import java.util.Iterator;
 
 /**
  * Created by kapeller on 21/03/16.
@@ -45,57 +46,99 @@ class IntStreamImpl implements IntStream {
     @Override
     public IntStream filter(IntPredicate predicate) {
         Utils.requireNonNull(predicate);
-        final IntIterator iterator = new IntPredicateIterator(mIterator, predicate);
-        return new IntStreamImpl(iterator);
+        final DummyIterator iterator = new DummyIterator();
+        return new IntStreamImpl(new IntChildIterator<>(
+                () -> {
+                    while (mIterator.hasNext()) {
+                        final int value = mIterator.nextInt();
+                        if (predicate.test(value)) {
+                            return iterator.newValue(value);
+                        }
+                    }
+                    return iterator;
+                },
+                IntIterator::hasNext,
+                IntIterator::nextInt
+        ));
     }
 
     @Override
     public IntStream map(IntUnaryOperator mapper) {
         Utils.requireNonNull(mapper);
-        final IntIterator iterator = new IntMappingIterator(mIterator, mapper);
-        return new IntStreamImpl(iterator);
+        return new IntStreamImpl(new IntChildIterator<>(
+                () -> mIterator,
+                IntIterator::hasNext,
+                iterator -> mapper.applyAsInt(mIterator.nextInt())
+        ));
     }
 
     @Override
     public IntStream flatMap(IntFunction<? extends IntStream> mapper) {
         Utils.requireNonNull(mapper);
-        final IntIterator iterator = new IntFlatMappingIterator(mIterator, mapper);
-        return new IntStreamImpl(iterator);
+        final IntIterator[] buffer = new IntIterator[1];
+        return new IntStreamImpl(new IntChildIterator<>(
+                () -> {
+                    if (buffer[0] == null || !buffer[0].hasNext()) {
+                        if (!mIterator.hasNext()) {
+                            return IntStreamCompat.EMPTY_ITERATOR;
+                        }
+                        buffer[0] = mapper.apply(mIterator.nextInt()).iterator();
+                    }
+                    return buffer[0];
+                },
+                IntIterator::hasNext,
+                IntIterator::nextInt
+        ));
     }
 
     @Override
     public <U> Stream<U> mapToObj(IntFunction<? extends U> mapper) {
         Utils.requireNonNull(mapper);
-        final Iterator<U> iterator = new IntToObjectMappingIterator<>(mIterator, mapper);
-        return StreamCompat.of(iterator);
+        return StreamCompat.of(new ChildIterator<>(
+                () -> mIterator,
+                IntIterator::hasNext,
+                iterator -> mapper.apply(mIterator.nextInt())
+        ));
     }
 
     @Override
     public LongStream mapToLong(IntToLongFunction mapper) {
         Utils.requireNonNull(mapper);
-        final LongIterator iterator = new IntToLongMappingIterator(mIterator, mapper);
-        return LongStreamCompat.of(iterator);
+        return LongStreamCompat.of(new LongChildIterator<>(
+                () -> mIterator,
+                IntIterator::hasNext,
+                iterator -> mapper.applyAsLong(mIterator.nextInt())
+        ));
     }
 
     @Override
     public DoubleStream mapToDouble(IntToDoubleFunction mapper) {
         Utils.requireNonNull(mapper);
-        final DoubleIterator iterator = new IntToDoubleMappingIterator(mIterator, mapper);
-        return DoubleStreamCompat.of(iterator);
+        return DoubleStreamCompat.of(new DoubleChildIterator<>(
+                () -> mIterator,
+                IntIterator::hasNext,
+                iterator -> mapper.applyAsDouble(mIterator.nextInt())
+        ));
     }
 
     @Override
     public FloatStream mapToFloat(IntToFloatFunction mapper) {
         Utils.requireNonNull(mapper);
-        final FloatIterator iterator = new IntToFloatMappingIterator(mIterator, mapper);
-        return FloatStreamCompat.of(iterator);
+        return FloatStreamCompat.of(new FloatChildIterator<>(
+                () -> mIterator,
+                IntIterator::hasNext,
+                iterator -> mapper.applyAsFloat(mIterator.nextInt())
+        ));
     }
 
     @Override
     public CharacterStream mapToChar(IntToCharFunction mapper) {
         Utils.requireNonNull(mapper);
-        final CharIterator iterator = new IntToCharMappingIterator(mIterator, mapper);
-        return CharacterStreamCompat.of(iterator);
+        return CharacterStreamCompat.of(new CharChildIterator<>(
+                () -> mIterator,
+                IntIterator::hasNext,
+                iterator -> mapper.applyAsChar(mIterator.nextInt())
+        ));
     }
 
     @Override
@@ -110,8 +153,15 @@ class IntStreamImpl implements IntStream {
 
     @Override
     public IntStream limit(long limit) {
-        final IntIterator iterator = new IntLimitIterator(mIterator, limit);
-        return new IntStreamImpl(iterator);
+        final long[] buffer = {0, limit};
+        return new IntStreamImpl(new IntChildIterator<>(
+                () -> mIterator,
+                iterator -> buffer[0] < buffer[1] && mIterator.hasNext(),
+                iterator -> {
+                    buffer[0]++;
+                    return iterator.nextInt();
+                }
+        ));
     }
 
     @Override
@@ -218,5 +268,46 @@ class IntStreamImpl implements IntStream {
             }
         }
         return true;
+    }
+
+    private static class DummyIterator extends BaseIterator<Integer> implements IntIterator {
+
+        private int mValue;
+        private boolean mHasNext;
+
+        public DummyIterator(int value) {
+            this(value, true);
+        }
+
+        public DummyIterator() {
+            this(0, false);
+        }
+
+        private DummyIterator(int value, boolean hasNext) {
+            mValue = value;
+            mHasNext = hasNext;
+        }
+
+        public DummyIterator newValue(int value) {
+            mValue = value;
+            mHasNext = true;
+            return this;
+        }
+
+        @Override
+        public int nextInt() {
+            mHasNext = false;
+            return mValue;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return mHasNext;
+        }
+
+        @Override
+        public Integer next() {
+            return nextInt();
+        }
     }
 }

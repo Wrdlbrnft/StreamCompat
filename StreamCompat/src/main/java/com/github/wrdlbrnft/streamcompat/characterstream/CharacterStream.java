@@ -13,7 +13,7 @@ import com.github.wrdlbrnft.streamcompat.function.CharUnaryOperator;
 import com.github.wrdlbrnft.streamcompat.function.ObjCharConsumer;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStream;
-import com.github.wrdlbrnft.streamcompat.iterator.CharIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.primtive.CharIterator;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStream;
 import com.github.wrdlbrnft.streamcompat.stream.Stream;
 import com.github.wrdlbrnft.streamcompat.util.OptionalCharacter;

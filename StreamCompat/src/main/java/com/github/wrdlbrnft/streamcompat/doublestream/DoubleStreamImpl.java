@@ -16,11 +16,14 @@ import com.github.wrdlbrnft.streamcompat.function.ObjDoubleConsumer;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStream;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStreamCompat;
-import com.github.wrdlbrnft.streamcompat.iterator.CharIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.DoubleIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.FloatIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.IntIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.LongIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.primtive.DoubleIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.base.BaseIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.CharChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.ChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.DoubleChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.FloatChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.IntChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.LongChildIterator;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStream;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStreamCompat;
 import com.github.wrdlbrnft.streamcompat.stream.Stream;
@@ -28,8 +31,6 @@ import com.github.wrdlbrnft.streamcompat.stream.StreamCompat;
 import com.github.wrdlbrnft.streamcompat.util.KahanSummation;
 import com.github.wrdlbrnft.streamcompat.util.OptionalDouble;
 import com.github.wrdlbrnft.streamcompat.util.Utils;
-
-import java.util.Iterator;
 
 /**
  * Created by kapeller on 21/03/16.
@@ -45,57 +46,99 @@ class DoubleStreamImpl implements DoubleStream {
     @Override
     public DoubleStream filter(DoublePredicate predicate) {
         Utils.requireNonNull(predicate);
-        final DoubleIterator iterator = new DoublePredicateIterator(mIterator, predicate);
-        return new DoubleStreamImpl(iterator);
+        final DummyIterator iterator = new DummyIterator();
+        return new DoubleStreamImpl(new DoubleChildIterator<>(
+                () -> {
+                    while (mIterator.hasNext()) {
+                        final double value = mIterator.nextDouble();
+                        if (predicate.test(value)) {
+                            return iterator.newValue(value);
+                        }
+                    }
+                    return iterator;
+                },
+                DoubleIterator::hasNext,
+                DoubleIterator::nextDouble
+        ));
     }
 
     @Override
     public DoubleStream map(DoubleUnaryOperator mapper) {
         Utils.requireNonNull(mapper);
-        final DoubleIterator iterator = new DoubleMappingIterator(mIterator, mapper);
-        return new DoubleStreamImpl(iterator);
+        return new DoubleStreamImpl(new DoubleChildIterator<>(
+                () -> mIterator,
+                DoubleIterator::hasNext,
+                iterator -> mapper.applyAsDouble(iterator.nextDouble())
+        ));
     }
 
     @Override
     public DoubleStream flatMap(DoubleFunction<? extends DoubleStream> mapper) {
         Utils.requireNonNull(mapper);
-        final DoubleIterator iterator = new DoubleFlatMappingIterator(mIterator, mapper);
-        return new DoubleStreamImpl(iterator);
+        final DoubleIterator[] buffer = new DoubleIterator[1];
+        return new DoubleStreamImpl(new DoubleChildIterator<>(
+                () -> {
+                    if (buffer[0] == null || !buffer[0].hasNext()) {
+                        if (!mIterator.hasNext()) {
+                            return DoubleStreamCompat.EMPTY_ITERATOR;
+                        }
+                        buffer[0] = mapper.apply(mIterator.nextDouble()).iterator();
+                    }
+                    return buffer[0];
+                },
+                DoubleIterator::hasNext,
+                DoubleIterator::nextDouble
+        ));
     }
 
     @Override
     public <U> Stream<U> mapToObj(DoubleFunction<? extends U> mapper) {
         Utils.requireNonNull(mapper);
-        final Iterator<U> iterator = new DoubleToObjectMappingIterator<>(mIterator, mapper);
-        return StreamCompat.of(iterator);
+        return StreamCompat.of(new ChildIterator<>(
+                () -> mIterator,
+                DoubleIterator::hasNext,
+                iterator -> mapper.apply(mIterator.nextDouble())
+        ));
     }
 
     @Override
     public LongStream mapToLong(DoubleToLongFunction mapper) {
         Utils.requireNonNull(mapper);
-        final LongIterator iterator = new DoubleToLongMappingIterator(mIterator, mapper);
-        return LongStreamCompat.of(iterator);
+        return LongStreamCompat.of(new LongChildIterator<>(
+                () -> mIterator,
+                DoubleIterator::hasNext,
+                iterator -> mapper.applyAsLong(mIterator.nextDouble())
+        ));
     }
 
     @Override
     public FloatStream mapToFloat(DoubleToFloatFunction mapper) {
         Utils.requireNonNull(mapper);
-        final FloatIterator iterator = new DoubleToFloatMappingIterator(mIterator, mapper);
-        return FloatStreamCompat.of(iterator);
+        return FloatStreamCompat.of(new FloatChildIterator<>(
+                () -> mIterator,
+                DoubleIterator::hasNext,
+                iterator -> mapper.applyAsFloat(mIterator.nextDouble())
+        ));
     }
 
     @Override
     public IntStream mapToInt(DoubleToIntFunction mapper) {
         Utils.requireNonNull(mapper);
-        final IntIterator iterator = new DoubleToIntMappingIterator(mIterator, mapper);
-        return IntStreamCompat.of(iterator);
+        return IntStreamCompat.of(new IntChildIterator<>(
+                () -> mIterator,
+                DoubleIterator::hasNext,
+                iterator -> mapper.applyAsInt(mIterator.nextDouble())
+        ));
     }
 
     @Override
     public CharacterStream mapToChar(DoubleToCharFunction mapper) {
         Utils.requireNonNull(mapper);
-        final CharIterator iterator = new DoubleToCharMappingIterator(mIterator, mapper);
-        return CharacterStreamCompat.of(iterator);
+        return CharacterStreamCompat.of(new CharChildIterator<>(
+                () -> mIterator,
+                DoubleIterator::hasNext,
+                iterator -> mapper.applyAsChar(mIterator.nextDouble())
+        ));
     }
 
     @Override
@@ -110,8 +153,15 @@ class DoubleStreamImpl implements DoubleStream {
 
     @Override
     public DoubleStream limit(long limit) {
-        final DoubleIterator iterator = new DoubleLimitIterator(mIterator, limit);
-        return new DoubleStreamImpl(iterator);
+        final long[] buffer = {0, limit};
+        return new DoubleStreamImpl(new DoubleChildIterator<>(
+                () -> mIterator,
+                iterator -> buffer[0] < buffer[1] && mIterator.hasNext(),
+                iterator -> {
+                    buffer[0]++;
+                    return mIterator.nextDouble();
+                }
+        ));
     }
 
     @Override
@@ -226,5 +276,46 @@ class DoubleStreamImpl implements DoubleStream {
             }
         }
         return true;
+    }
+
+    private static class DummyIterator extends BaseIterator<Double> implements DoubleIterator {
+
+        private double mValue;
+        private boolean mHasNext;
+
+        public DummyIterator(double value) {
+            this(value, true);
+        }
+
+        public DummyIterator() {
+            this(0.0f, false);
+        }
+
+        private DummyIterator(double value, boolean hasNext) {
+            mValue = value;
+            mHasNext = hasNext;
+        }
+
+        public DummyIterator newValue(double value) {
+            mValue = value;
+            mHasNext = true;
+            return this;
+        }
+
+        @Override
+        public double nextDouble() {
+            mHasNext = false;
+            return mValue;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return mHasNext;
+        }
+
+        @Override
+        public Double next() {
+            return nextDouble();
+        }
     }
 }

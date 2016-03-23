@@ -18,14 +18,18 @@ import com.github.wrdlbrnft.streamcompat.function.ToIntFunction;
 import com.github.wrdlbrnft.streamcompat.function.ToLongFunction;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStream;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStreamCompat;
-import com.github.wrdlbrnft.streamcompat.iterator.CharIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.DoubleIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.FloatIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.IntIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.LongIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.base.concat.BaseConcatIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.base.concat.ChildHandler;
-import com.github.wrdlbrnft.streamcompat.iterator.base.concat.DataSource;
+import com.github.wrdlbrnft.streamcompat.iterator.primtive.CharIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.primtive.DoubleIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.primtive.FloatIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.primtive.IntIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.primtive.LongIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.base.BaseIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.CharChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.ChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.DoubleChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.FloatChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.IntChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.LongChildIterator;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStream;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStreamCompat;
 import com.github.wrdlbrnft.streamcompat.util.Optional;
@@ -48,96 +52,194 @@ class StreamImpl<T> implements Stream<T> {
     @Override
     public Stream<T> filter(Predicate<T> predicate) {
         Utils.requireNonNull(predicate);
-        final Iterator<T> iterator = new PredicateIterator<>(mIterator, predicate);
-        return new StreamImpl<>(iterator);
+        final DummyIterator<T> iterator = new DummyIterator<>();
+        return new StreamImpl<>(new ChildIterator<>(
+                () -> {
+                    while (mIterator.hasNext()) {
+                        final T value = mIterator.next();
+                        if (predicate.test(value)) {
+                            return iterator.newValue(value);
+                        }
+                    }
+                    return iterator;
+                },
+                Iterator::hasNext,
+                Iterator::next
+        ));
     }
 
     @Override
     public <R> Stream<R> map(Function<T, ? extends R> mapper) {
         Utils.requireNonNull(mapper);
-        final Iterator<R> iterator = new MappingIterator<>(mIterator, mapper);
-        return new StreamImpl<>(iterator);
+        return new StreamImpl<>(new ChildIterator<>(
+                () -> mIterator,
+                Iterator::hasNext,
+                iterator -> mapper.apply(mIterator.next())
+        ));
     }
 
     @Override
     public IntStream mapToInt(ToIntFunction<? super T> mapper) {
         Utils.requireNonNull(mapper);
-        final IntIterator iterator = new MapToIntIterator<>(mIterator, mapper);
-        return IntStreamCompat.of(iterator);
+        return IntStreamCompat.of(new IntChildIterator<>(
+                () -> mIterator,
+                Iterator::hasNext,
+                iterator -> mapper.apply(mIterator.next())
+        ));
     }
 
     @Override
     public LongStream mapToLong(ToLongFunction<? super T> mapper) {
         Utils.requireNonNull(mapper);
-        final LongIterator iterator = new MapToLongIterator<>(mIterator, mapper);
-        return LongStreamCompat.of(iterator);
+        return LongStreamCompat.of(new LongChildIterator<>(
+                () -> mIterator,
+                Iterator::hasNext,
+                iterator -> mapper.apply(mIterator.next())
+        ));
     }
 
     @Override
     public DoubleStream mapToDouble(ToDoubleFunction<? super T> mapper) {
         Utils.requireNonNull(mapper);
-        final DoubleIterator iterator = new MapToDoubleIterator<>(mIterator, mapper);
-        return DoubleStreamCompat.of(iterator);
+        return DoubleStreamCompat.of(new DoubleChildIterator<>(
+                () -> mIterator,
+                Iterator::hasNext,
+                iterator -> mapper.apply(mIterator.next())
+        ));
     }
 
     @Override
     public FloatStream mapToFloat(ToFloatFunction<? super T> mapper) {
         Utils.requireNonNull(mapper);
-        final FloatIterator iterator = new MapToFloatIterator<>(mIterator, mapper);
-        return FloatStreamCompat.of(iterator);
+        return FloatStreamCompat.of(new FloatChildIterator<>(
+                () -> mIterator,
+                Iterator::hasNext,
+                iterator -> mapper.apply(mIterator.next())
+        ));
     }
 
     @Override
     public CharacterStream mapToChar(ToCharFunction<? super T> mapper) {
         Utils.requireNonNull(mapper);
-        final CharIterator iterator = new MapToCharIterator<>(mIterator, mapper);
-        return CharacterStreamCompat.of(iterator);
+        return CharacterStreamCompat.of(new CharChildIterator<>(
+                () -> mIterator,
+                Iterator::hasNext,
+                iterator -> mapper.apply(mIterator.next())
+        ));
     }
 
     @Override
     public <R> Stream<R> flatMap(Function<T, ? extends Stream<? extends R>> mapper) {
         Utils.requireNonNull(mapper);
-        return new StreamImpl<>(new BaseConcatIterator<>(
-                DataSource.of(mIterator),
-                t -> mapper.apply(t).iterator(),
-                ChildHandler.forIterator(),
-                Utils::emptyIterator
+        final Iterator[] buffer = new Iterator[1];
+        return new StreamImpl<>(new ChildIterator<R, R, Iterator<R>>(
+                () -> {
+                    if (buffer[0] == null || !buffer[0].hasNext()) {
+                        if (!mIterator.hasNext()) {
+                            return Utils.emptyIterator();
+                        }
+                        buffer[0] = mapper.apply(mIterator.next()).iterator();
+                    }
+                    return buffer[0];
+                },
+                Iterator::hasNext,
+                Iterator::next
         ));
     }
 
     @Override
     public IntStream flatMapToInt(Function<? super T, ? extends IntStream> mapper) {
         Utils.requireNonNull(mapper);
-        final IntIterator iterator = new FlatMapToIntIterator<>(mIterator, mapper);
-        return IntStreamCompat.of(iterator);
+        final IntIterator[] buffer = new IntIterator[1];
+        return IntStreamCompat.of(new IntChildIterator<>(
+                () -> {
+                    if (buffer[0] == null || !buffer[0].hasNext()) {
+                        if (!mIterator.hasNext()) {
+                            return IntStreamCompat.empty().iterator();
+                        }
+                        buffer[0] = mapper.apply(mIterator.next()).iterator();
+                    }
+                    return buffer[0];
+                },
+                IntIterator::hasNext,
+                IntIterator::nextInt
+        ));
     }
 
     @Override
     public LongStream flatMapToLong(Function<? super T, ? extends LongStream> mapper) {
         Utils.requireNonNull(mapper);
-        final LongIterator iterator = new FlatMapToLongIterator<>(mIterator, mapper);
-        return LongStreamCompat.of(iterator);
+        final LongIterator[] buffer = new LongIterator[1];
+        return LongStreamCompat.of(new LongChildIterator<>(
+                () -> {
+                    if (buffer[0] == null || !buffer[0].hasNext()) {
+                        if (!mIterator.hasNext()) {
+                            return LongStreamCompat.empty().iterator();
+                        }
+                        buffer[0] = mapper.apply(mIterator.next()).iterator();
+                    }
+                    return buffer[0];
+                },
+                LongIterator::hasNext,
+                LongIterator::nextLong
+        ));
     }
 
     @Override
     public FloatStream flatMapToFloat(Function<? super T, ? extends FloatStream> mapper) {
         Utils.requireNonNull(mapper);
-        final FloatIterator iterator = new FlatMapToFloatIterator<>(mIterator, mapper);
-        return FloatStreamCompat.of(iterator);
+        final FloatIterator[] buffer = new FloatIterator[1];
+        return FloatStreamCompat.of(new FloatChildIterator<>(
+                () -> {
+                    if (buffer[0] == null || !buffer[0].hasNext()) {
+                        if (!mIterator.hasNext()) {
+                            return FloatStreamCompat.empty().iterator();
+                        }
+                        buffer[0] = mapper.apply(mIterator.next()).iterator();
+                    }
+                    return buffer[0];
+                },
+                FloatIterator::hasNext,
+                FloatIterator::nextFloat
+        ));
     }
 
     @Override
     public DoubleStream flatMapToDouble(Function<? super T, ? extends DoubleStream> mapper) {
         Utils.requireNonNull(mapper);
-        final DoubleIterator iterator = new FlatMapToDoubleIterator<>(mIterator, mapper);
-        return DoubleStreamCompat.of(iterator);
+        final DoubleIterator[] buffer = new DoubleIterator[1];
+        return DoubleStreamCompat.of(new DoubleChildIterator<>(
+                () -> {
+                    if (buffer[0] == null || !buffer[0].hasNext()) {
+                        if (!mIterator.hasNext()) {
+                            return DoubleStreamCompat.empty().iterator();
+                        }
+                        buffer[0] = mapper.apply(mIterator.next()).iterator();
+                    }
+                    return buffer[0];
+                },
+                DoubleIterator::hasNext,
+                DoubleIterator::nextDouble
+        ));
     }
 
     @Override
     public CharacterStream flatMapToChar(Function<? super T, ? extends CharacterStream> mapper) {
         Utils.requireNonNull(mapper);
-        final CharIterator iterator = new FlatMapToCharIterator<>(mIterator, mapper);
-        return CharacterStreamCompat.of(iterator);
+        final CharIterator[] buffer = new CharIterator[1];
+        return CharacterStreamCompat.of(new CharChildIterator<>(
+                () -> {
+                    if (buffer[0] == null || !buffer[0].hasNext()) {
+                        if (!mIterator.hasNext()) {
+                            return CharacterStreamCompat.empty().iterator();
+                        }
+                        buffer[0] = mapper.apply(mIterator.next()).iterator();
+                    }
+                    return buffer[0];
+                },
+                CharIterator::hasNext,
+                CharIterator::nextChar
+        ));
     }
 
     @Override
@@ -163,8 +265,15 @@ class StreamImpl<T> implements Stream<T> {
 
     @Override
     public Stream<T> limit(long limit) {
-        final Iterator<T> iterator = new LimitIterator<>(mIterator, limit);
-        return new StreamImpl<>(iterator);
+        final long[] buffer = {0, limit};
+        return new StreamImpl<>(new ChildIterator<>(
+                () -> mIterator,
+                iterator -> buffer[0] < buffer[1] && mIterator.hasNext(),
+                iterator -> {
+                    buffer[0]++;
+                    return mIterator.next();
+                }
+        ));
     }
 
     @Override
@@ -265,5 +374,41 @@ class StreamImpl<T> implements Stream<T> {
     @Override
     public Iterator<T> iterator() {
         return mIterator;
+    }
+
+    private static class DummyIterator<T> extends BaseIterator<T> {
+
+        private T mValue;
+        private boolean mHasNext;
+
+        public DummyIterator(T value) {
+            this(value, true);
+        }
+
+        public DummyIterator() {
+            this(null, false);
+        }
+
+        private DummyIterator(T value, boolean hasNext) {
+            mValue = value;
+            mHasNext = hasNext;
+        }
+
+        public DummyIterator<T> newValue(T value) {
+            mValue = value;
+            mHasNext = true;
+            return this;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return mHasNext;
+        }
+
+        @Override
+        public T next() {
+            mHasNext = false;
+            return mValue;
+        }
     }
 }

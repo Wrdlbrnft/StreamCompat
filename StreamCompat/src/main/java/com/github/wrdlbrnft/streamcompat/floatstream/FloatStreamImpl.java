@@ -16,11 +16,14 @@ import com.github.wrdlbrnft.streamcompat.function.ObjFloatConsumer;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStream;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStreamCompat;
-import com.github.wrdlbrnft.streamcompat.iterator.CharIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.DoubleIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.FloatIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.IntIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.LongIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.primtive.FloatIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.base.BaseIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.CharChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.ChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.DoubleChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.FloatChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.IntChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.LongChildIterator;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStream;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStreamCompat;
 import com.github.wrdlbrnft.streamcompat.stream.Stream;
@@ -28,8 +31,6 @@ import com.github.wrdlbrnft.streamcompat.stream.StreamCompat;
 import com.github.wrdlbrnft.streamcompat.util.KahanSummation;
 import com.github.wrdlbrnft.streamcompat.util.OptionalFloat;
 import com.github.wrdlbrnft.streamcompat.util.Utils;
-
-import java.util.Iterator;
 
 /**
  * Created by kapeller on 21/03/16.
@@ -45,57 +46,99 @@ class FloatStreamImpl implements FloatStream {
     @Override
     public FloatStream filter(FloatPredicate predicate) {
         Utils.requireNonNull(predicate);
-        final FloatIterator iterator = new FloatPredicateIterator(mIterator, predicate);
-        return new FloatStreamImpl(iterator);
+        final DummyIterator iterator = new DummyIterator();
+        return new FloatStreamImpl(new FloatChildIterator<>(
+                () -> {
+                    while (mIterator.hasNext()) {
+                        final float value = mIterator.nextFloat();
+                        if (predicate.test(value)) {
+                            return iterator.newValue(value);
+                        }
+                    }
+                    return iterator;
+                },
+                FloatIterator::hasNext,
+                FloatIterator::nextFloat
+        ));
     }
 
     @Override
     public FloatStream map(FloatUnaryOperator mapper) {
         Utils.requireNonNull(mapper);
-        final FloatIterator iterator = new FloatMappingIterator(mIterator, mapper);
-        return new FloatStreamImpl(iterator);
+        return new FloatStreamImpl(new FloatChildIterator<>(
+                () -> mIterator,
+                FloatIterator::hasNext,
+                iterator -> mapper.applyAsFloat(mIterator.nextFloat())
+        ));
     }
 
     @Override
     public FloatStream flatMap(FloatFunction<? extends FloatStream> mapper) {
         Utils.requireNonNull(mapper);
-        final FloatIterator iterator = new FloatFlatMappingIterator(mIterator, mapper);
-        return new FloatStreamImpl(iterator);
+        final FloatIterator[] buffer = new FloatIterator[1];
+        return new FloatStreamImpl(new FloatChildIterator<>(
+                () -> {
+                    if (buffer[0] == null || !buffer[0].hasNext()) {
+                        if (!mIterator.hasNext()) {
+                            return FloatStreamCompat.EMPTY_ITERATOR;
+                        }
+                        buffer[0] = mapper.apply(mIterator.nextFloat()).iterator();
+                    }
+                    return buffer[0];
+                },
+                FloatIterator::hasNext,
+                FloatIterator::nextFloat
+        ));
     }
 
     @Override
     public <U> Stream<U> mapToObj(FloatFunction<? extends U> mapper) {
         Utils.requireNonNull(mapper);
-        final Iterator<U> iterator = new FloatToObjectMappingIterator<>(mIterator, mapper);
-        return StreamCompat.of(iterator);
+        return StreamCompat.of(new ChildIterator<>(
+                () -> mIterator,
+                FloatIterator::hasNext,
+                iterator -> mapper.apply(mIterator.nextFloat())
+        ));
     }
 
     @Override
     public LongStream mapToLong(FloatToLongFunction mapper) {
         Utils.requireNonNull(mapper);
-        final LongIterator iterator = new FloatToLongMappingIterator(mIterator, mapper);
-        return LongStreamCompat.of(iterator);
+        return LongStreamCompat.of(new LongChildIterator<>(
+                () -> mIterator,
+                FloatIterator::hasNext,
+                iterator -> mapper.applyAsLong(mIterator.nextFloat())
+        ));
     }
 
     @Override
     public IntStream mapToInt(FloatToIntFunction mapper) {
         Utils.requireNonNull(mapper);
-        final IntIterator iterator = new FloatToIntMappingIterator(mIterator, mapper);
-        return IntStreamCompat.of(iterator);
+        return IntStreamCompat.of(new IntChildIterator<>(
+                () -> mIterator,
+                FloatIterator::hasNext,
+                iterator -> mapper.applyAsInt(mIterator.nextFloat())
+        ));
     }
 
     @Override
     public CharacterStream mapToChar(FloatToCharFunction mapper) {
         Utils.requireNonNull(mapper);
-        final CharIterator iterator = new FloatToCharMappingIterator(mIterator, mapper);
-        return CharacterStreamCompat.of(iterator);
+        return CharacterStreamCompat.of(new CharChildIterator<>(
+                () -> mIterator,
+                FloatIterator::hasNext,
+                iterator -> mapper.applyAsChar(mIterator.nextFloat())
+        ));
     }
 
     @Override
     public DoubleStream mapToDouble(FloatToDoubleFunction mapper) {
         Utils.requireNonNull(mapper);
-        final DoubleIterator iterator = new FloatToDoubleMappingIterator(mIterator, mapper);
-        return DoubleStreamCompat.of(iterator);
+        return DoubleStreamCompat.of(new DoubleChildIterator<>(
+                () -> mIterator,
+                FloatIterator::hasNext,
+                iterator -> mapper.applyAsDouble(mIterator.nextFloat())
+        ));
     }
 
     @Override
@@ -110,8 +153,15 @@ class FloatStreamImpl implements FloatStream {
 
     @Override
     public FloatStream limit(long limit) {
-        final FloatIterator iterator = new FloatLimitIterator(mIterator, limit);
-        return new FloatStreamImpl(iterator);
+        final long[] buffer = {0, limit};
+        return new FloatStreamImpl(new FloatChildIterator<>(
+                () -> mIterator,
+                iterator -> buffer[0] < buffer[1] && mIterator.hasNext(),
+                iterator -> {
+                    buffer[0]++;
+                    return mIterator.nextFloat();
+                }
+        ));
     }
 
     @Override
@@ -226,5 +276,46 @@ class FloatStreamImpl implements FloatStream {
             }
         }
         return true;
+    }
+
+    private static class DummyIterator extends BaseIterator<Float> implements FloatIterator {
+
+        private float mValue;
+        private boolean mHasNext;
+
+        public DummyIterator(float value) {
+            this(value, true);
+        }
+
+        public DummyIterator() {
+            this(0.0f, false);
+        }
+
+        private DummyIterator(float value, boolean hasNext) {
+            mValue = value;
+            mHasNext = hasNext;
+        }
+
+        public DummyIterator newValue(float value) {
+            mValue = value;
+            mHasNext = true;
+            return this;
+        }
+
+        @Override
+        public float nextFloat() {
+            mHasNext = false;
+            return mValue;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return mHasNext;
+        }
+
+        @Override
+        public Float next() {
+            return nextFloat();
+        }
     }
 }

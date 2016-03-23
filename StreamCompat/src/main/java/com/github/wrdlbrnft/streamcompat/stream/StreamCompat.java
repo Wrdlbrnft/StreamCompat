@@ -1,13 +1,12 @@
 package com.github.wrdlbrnft.streamcompat.stream;
 
-import com.github.wrdlbrnft.streamcompat.iterator.CharArrayIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.DoubleArrayIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.FloatArrayIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.IntArrayIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.LongArrayIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.base.concat.BaseConcatIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.base.concat.ChildHandler;
-import com.github.wrdlbrnft.streamcompat.iterator.base.concat.DataSource;
+import com.github.wrdlbrnft.streamcompat.iterator.array.ArrayIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.array.CharArrayIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.array.DoubleArrayIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.array.FloatArrayIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.array.IntArrayIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.array.LongArrayIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.ChildIterator;
 import com.github.wrdlbrnft.streamcompat.util.Utils;
 
 import java.util.Collections;
@@ -27,11 +26,20 @@ public class StreamCompat {
 
     @SafeVarargs
     public static <S> Stream<S> concat(Stream<S>... streams) {
-        return new StreamImpl<>(new BaseConcatIterator<>(
-                DataSource.of(streams),
-                Stream::iterator,
-                ChildHandler.forIterator(),
-                Utils::emptyIterator
+        final Iterator<Stream<S>> iterator = new ArrayIterator<>(streams);
+        final Iterator<S>[] buffer = new Iterator[1];
+        return new StreamImpl<>(new ChildIterator<>(
+                () -> {
+                    if (buffer[0] == null || !buffer[0].hasNext()) {
+                        if (!iterator.hasNext()) {
+                            return Utils.emptyIterator();
+                        }
+                        buffer[0] = iterator.next().iterator();
+                    }
+                    return buffer[0];
+                },
+                Iterator::hasNext,
+                Iterator::next
         ));
     }
 

@@ -14,7 +14,7 @@ import com.github.wrdlbrnft.streamcompat.function.LongUnaryOperator;
 import com.github.wrdlbrnft.streamcompat.function.ObjLongConsumer;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStream;
-import com.github.wrdlbrnft.streamcompat.iterator.LongIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.primtive.LongIterator;
 import com.github.wrdlbrnft.streamcompat.stream.Stream;
 import com.github.wrdlbrnft.streamcompat.util.OptionalDouble;
 import com.github.wrdlbrnft.streamcompat.util.OptionalLong;

@@ -17,13 +17,14 @@ public class StreamTests {
     @Test
     public void testBasic() {
         final LongSparseArray<Long> array = StreamCompat.of("ASDF", "test", "wwwew", "z", "qqq", "sdalgekasdgkl", "q[rgeeu0", "zflb;ndz")
-                .flatMapToChar(text -> CharacterStreamCompat.of(text.toCharArray())
-                        .filter(Character::isLowerCase)
-                        .limit(5))
+                .map(StringBuilder::new)
+                .map(StringBuilder::reverse)
+                .map(StringBuilder::toString)
+                .flatMapToChar(text -> CharacterStreamCompat.of(text.toCharArray()))
                 .boxed()
                 .collect(Collectors.groupingInLongSparseArray(Character::hashCode, Collectors.toCount()));
 
-        Assert.assertEquals(1L, array.get('a').longValue());
+        Assert.assertEquals(1L, array.get('b').longValue());
     }
 
     @Test
