@@ -2,14 +2,15 @@
 
 Use Streams everywhere just like you know them!
 
-* **Works on API level 7 and above**: With the new Jack Compiler you can use all the things that make Java 8s Stream API so great. Method references and lambda expressions on API level 7 and above! That's **100%** of all Android devices.
-* **Efficient and Performant**: Regarless of how many filter, map or flatMap statements you use every item in source collection will be evaluated **only once**. That means high performance that scales really well!
+* **Works on every Android Device**: With the new Jack Compiler you can use all the things that make Java 8s Stream API so great on API level 7 and above. Don't feel like using the preview version of the build tools? Then just use Retrolambda in the meantime!
+* **Efficient and Performant**: Regarless of how many filter, map or flatMap statements you use every item in source collection will be evaluated **only once**. That means high performance that scales very well!
+* **Optimized for Mobile Devices**: This isn't just a straight backport of the Stream API! It uses an Iterator based implementation which avoids autoboxing wherever possible and defaults to memory efficient Collections to ensure that mobile developers can use it without having to worry about anything! 
 
 ```java
 final List<ViewModel> viewModels = StreamCompat.of(models)
         .filter(ExampleModel::isVisible)
-        .map(ExampleModel::getTextResId)
-        .map(this::getString)
+        .mapToInt(ExampleModel::getTextResId)
+        .mapToObj(context::getString)
         .map(ViewModel::new)
         .collect(Collectors.toList());
 ```
@@ -18,7 +19,8 @@ final List<ViewModel> viewModels = StreamCompat.of(models)
 
 * [Installation](#installation)
   * [Stream Compat](#streamcompat)
-  * [JACK Compiler](#jack-compiler)
+  * [Using Retrolambda](#using-retrolambda)
+  * [Using the JACK Compiler](#using-the-jack-compiler)
 * [Examples](#examples)
 * [Features](#features)
   * [Overview](#overview)
@@ -35,18 +37,49 @@ final List<ViewModel> viewModels = StreamCompat.of(models)
 To use StreamCompat just add this to the dependencies closure in your build.gradle:
 
 ```
-compile 'com.github.wrdlbrnft:stream-compat:0.1.0.15'
+compile 'com.github.wrdlbrnft:stream-compat:0.1.0.18'
 ```
 
-To take advantage of Java 8 features you also need to enable JACK which is explained in the next chapter.
+If you are using Maven you can add the dependency like this:
 
-## JACK Compiler
-To use method references and lambda expressions you need to use the new JACK Compiler!
+```
+<dependency>
+  <groupId>com.github.wrdlbrnft</groupId>
+  <artifactId>stream-compat</artifactId>
+  <version>0.1.0.18</version>
+</dependency>
+```
+
+To use method references and lambda expressions you either need to use the JACK compiler which is part of the preview build tools or if you don't want to do that you can just use Retrolambda instead!
+
+## Using Retrolambda
+
+TO use Retrolambda just paste the following at the very top of your build.gradle:
+
+```
+buildscript {
+  repositories {
+     jcenter()
+  }
+
+  dependencies {
+     classpath 'me.tatarka:gradle-retrolambda:3.2.5'
+  }
+}
+```
+
+After that you just have to add `` below all your other `apply plugin` statements:
+
+
+
+## Using the JACK Compiler
 
 To activate it you need to modify three things in your build.gradle:
- 1. Set your `buildToolsVersion` to `24.0.0 rc1` or higher
- 2. Enable JACK in the `jackOptions` closure
- 3. Set your language level to Java 8 in the `compileOptions` closure
+ 1. Set your `buildToolsVersion` to `24.0.0 rc1` or higher. I recommend using the current version `24.0.0 rc2`.
+ 2. Enable JACK in the `jackOptions` closure.
+ 3. Set your language level to Java 8 in the `compileOptions` closure.
+
+If you do that the build.gradle of your app module should look something like this:
 
 ```
 android {
