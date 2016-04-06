@@ -37,7 +37,7 @@ final List<ViewModel> viewModels = StreamCompat.of(models)
 To use StreamCompat just add this to the dependencies closure in your build.gradle:
 
 ```
-compile 'com.github.wrdlbrnft:stream-compat:0.1.0.18'
+compile 'com.github.wrdlbrnft:stream-compat:0.1.0.20'
 ```
 
 If you are using Maven you can add the dependency like this:
