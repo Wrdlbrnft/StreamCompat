@@ -5,6 +5,7 @@ import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStreamCompat;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStream;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStreamCompat;
 import com.github.wrdlbrnft.streamcompat.function.DoubleBinaryOperator;
+import com.github.wrdlbrnft.streamcompat.function.DoubleConsumer;
 import com.github.wrdlbrnft.streamcompat.function.DoubleFunction;
 import com.github.wrdlbrnft.streamcompat.function.DoublePredicate;
 import com.github.wrdlbrnft.streamcompat.function.DoubleToCharFunction;
@@ -29,7 +30,7 @@ import com.github.wrdlbrnft.streamcompat.longstream.LongStreamCompat;
 import com.github.wrdlbrnft.streamcompat.stream.Stream;
 import com.github.wrdlbrnft.streamcompat.stream.StreamCompat;
 import com.github.wrdlbrnft.streamcompat.util.KahanSummation;
-import com.github.wrdlbrnft.streamcompat.util.OptionalDouble;
+import com.github.wrdlbrnft.streamcompat.optionals.OptionalDouble;
 import com.github.wrdlbrnft.streamcompat.util.Utils;
 
 /**
@@ -37,6 +38,7 @@ import com.github.wrdlbrnft.streamcompat.util.Utils;
  */
 class DoubleStreamImpl implements DoubleStream {
 
+    private static final int DEFAULT_ARRAY_SIZE = 16;
     private final DoubleIterator mIterator;
 
     DoubleStreamImpl(DoubleIterator iterator) {
@@ -144,6 +146,16 @@ class DoubleStreamImpl implements DoubleStream {
     @Override
     public DoubleIterator iterator() {
         return mIterator;
+    }
+
+    @Override
+    public void forEach(DoubleConsumer action) {
+        Utils.requireNonNull(action);
+
+        while (mIterator.hasNext()) {
+            final double value = mIterator.nextDouble();
+            action.accept(value);
+        }
     }
 
     @Override
@@ -276,6 +288,27 @@ class DoubleStreamImpl implements DoubleStream {
             }
         }
         return true;
+    }
+
+    @Override
+    public double[] toArray() {
+        double[] tmp = new double[DEFAULT_ARRAY_SIZE];
+        int index = 0;
+        while (mIterator.hasNext()) {
+            final double c = mIterator.nextDouble();
+
+            if (index >= tmp.length) {
+                final double[] newArray = new double[tmp.length * 2];
+                System.arraycopy(tmp, 0, newArray, 0, tmp.length);
+                tmp = newArray;
+            }
+
+            tmp[index++] = c;
+        }
+
+        final double[] result = new double[index];
+        System.arraycopy(tmp, 0, result, 0, index);
+        return result;
     }
 
     private static class DummyIterator extends BaseIterator<Double> implements DoubleIterator {

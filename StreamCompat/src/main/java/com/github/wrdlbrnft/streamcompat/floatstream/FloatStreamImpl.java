@@ -5,6 +5,7 @@ import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStreamCompat;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStream;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStreamCompat;
 import com.github.wrdlbrnft.streamcompat.function.FloatBinaryOperator;
+import com.github.wrdlbrnft.streamcompat.function.FloatConsumer;
 import com.github.wrdlbrnft.streamcompat.function.FloatFunction;
 import com.github.wrdlbrnft.streamcompat.function.FloatPredicate;
 import com.github.wrdlbrnft.streamcompat.function.FloatToCharFunction;
@@ -16,7 +17,6 @@ import com.github.wrdlbrnft.streamcompat.function.ObjFloatConsumer;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStream;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStreamCompat;
-import com.github.wrdlbrnft.streamcompat.iterator.primtive.FloatIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.base.BaseIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.CharChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.ChildIterator;
@@ -24,12 +24,13 @@ import com.github.wrdlbrnft.streamcompat.iterator.child.DoubleChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.FloatChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.IntChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.LongChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.primtive.FloatIterator;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStream;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStreamCompat;
 import com.github.wrdlbrnft.streamcompat.stream.Stream;
 import com.github.wrdlbrnft.streamcompat.stream.StreamCompat;
 import com.github.wrdlbrnft.streamcompat.util.KahanSummation;
-import com.github.wrdlbrnft.streamcompat.util.OptionalFloat;
+import com.github.wrdlbrnft.streamcompat.optionals.OptionalFloat;
 import com.github.wrdlbrnft.streamcompat.util.Utils;
 
 /**
@@ -37,6 +38,7 @@ import com.github.wrdlbrnft.streamcompat.util.Utils;
  */
 class FloatStreamImpl implements FloatStream {
 
+    private static final int DEFAULT_ARRAY_SIZE = 16;
     private final FloatIterator mIterator;
 
     FloatStreamImpl(FloatIterator iterator) {
@@ -144,6 +146,16 @@ class FloatStreamImpl implements FloatStream {
     @Override
     public FloatIterator iterator() {
         return mIterator;
+    }
+
+    @Override
+    public void forEach(FloatConsumer action) {
+        Utils.requireNonNull(action);
+
+        while (mIterator.hasNext()) {
+            final float value = mIterator.nextFloat();
+            action.accept(value);
+        }
     }
 
     @Override
@@ -276,6 +288,27 @@ class FloatStreamImpl implements FloatStream {
             }
         }
         return true;
+    }
+
+    @Override
+    public float[] toArray() {
+        float[] tmp = new float[DEFAULT_ARRAY_SIZE];
+        int index = 0;
+        while (mIterator.hasNext()) {
+            final float c = mIterator.nextFloat();
+
+            if (index >= tmp.length) {
+                final float[] newArray = new float[tmp.length * 2];
+                System.arraycopy(tmp, 0, newArray, 0, tmp.length);
+                tmp = newArray;
+            }
+
+            tmp[index++] = c;
+        }
+
+        final float[] result = new float[index];
+        System.arraycopy(tmp, 0, result, 0, index);
+        return result;
     }
 
     private static class DummyIterator extends BaseIterator<Float> implements FloatIterator {

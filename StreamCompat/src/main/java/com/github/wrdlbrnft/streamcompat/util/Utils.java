@@ -23,7 +23,7 @@ public class Utils {
         return object;
     }
 
-    public static <A, B> boolean equals(A a, B b) {
+    public static <A, B> boolean equal(A a, B b) {
         return (a == null) ? (b == null) : a.equals(b);
     }
 

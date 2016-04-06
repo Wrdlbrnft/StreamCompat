@@ -4,16 +4,17 @@ import android.support.v4.util.ArrayMap;
 import android.support.v4.util.LongSparseArray;
 import android.util.SparseArray;
 
+import com.github.wrdlbrnft.streamcompat.collections.ArraySet;
+import com.github.wrdlbrnft.streamcompat.collections.compat.LongSparseArrayCompat;
+import com.github.wrdlbrnft.streamcompat.collections.compat.MapCompat;
+import com.github.wrdlbrnft.streamcompat.collections.compat.SparseArrayCompat;
 import com.github.wrdlbrnft.streamcompat.function.BiConsumer;
 import com.github.wrdlbrnft.streamcompat.function.BinaryOperator;
 import com.github.wrdlbrnft.streamcompat.function.Function;
+import com.github.wrdlbrnft.streamcompat.function.IntFunction;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
 import com.github.wrdlbrnft.streamcompat.function.ToIntFunction;
 import com.github.wrdlbrnft.streamcompat.function.ToLongFunction;
-import com.github.wrdlbrnft.streamcompat.util.Counter;
-import com.github.wrdlbrnft.streamcompat.util.LongSparseArrayCompat;
-import com.github.wrdlbrnft.streamcompat.util.MapCompat;
-import com.github.wrdlbrnft.streamcompat.util.SparseArrayCompat;
 import com.github.wrdlbrnft.streamcompat.util.StringJoiner;
 import com.github.wrdlbrnft.streamcompat.util.Utils;
 
@@ -21,36 +22,96 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * Created by kapeller on 10/03/16.
+ * This class contains many predefined {@link Collector} implementations which provide many useful
+ * reduction operations like accumulating elements into {@link Collection Collections} or
+ * {@link Map Maps}.
  */
 public class Collectors {
 
-    public static <T> Collector<T, ?, List<T>> toList() {
-        return new CollectorImpl<T, List<T>, List<T>>(
+    /**
+     * Returns a {@link Collector} which accumulates the elements in a {@link Stream} into an array.
+     *
+     * @param arrayGenerator A generator function which creates a new array with the specified length.
+     * @param <T>            The type of the elements in the {@link Stream}.
+     * @return Returns a new {@link Collector} with the supplied generator function.
+     */
+    public static <T> Collector<T, ?, T[]> toArray(IntFunction<T[]> arrayGenerator) {
+        return new CollectorImpl<T, List<T>, T[]>(
                 ArrayList::new,
                 List::add,
-                (i) -> i
+                list -> {
+                    final T[] array = arrayGenerator.apply(list.size());
+                    return list.toArray(array);
+                }
         );
     }
 
+    /**
+     * Creates a {@link Collector} which accumulates the elements from a {@link Stream} into a
+     * {@link List}.
+     *
+     * @param <T> The type of the elements in the {@link Stream}
+     * @return Returns a new {@link Collector} which creates a {@link List} with the elements in
+     * a {@link Stream}.
+     */
+    public static <T> Collector<T, ?, List<T>> toList() {
+        return toList(ArrayList::new);
+    }
+
+    /**
+     * Creates a {@link Collector} which accumulates the elements from a {@link Stream} into the
+     * {@link List} provided by the {@link Supplier listSupplier}.
+     *
+     * @param listSupplier A function which creates a new {@link List} of the desired type.
+     * @param <T>          The type of the elements in the {@link Stream}.
+     * @param <L>          The type of the {@link List} provided by the {@link Supplier listSupplier}.
+     * @return Returns a new {@link Collector} which creates a {@link List} of the desired type with
+     * the elements in a {@link Stream}.
+     */
     public static <T, L extends List<T>> Collector<T, ?, L> toList(Supplier<L> listSupplier) {
         return new CollectorImpl<T, L, L>(
                 listSupplier,
-                List::add,
+                L::add,
                 (i) -> i
         );
     }
 
-    public static <T> Collector<T, ?, List<T>> toOrdereredList(Comparator<T> comparator) {
-        return new CollectorImpl<T, List<T>, List<T>>(
-                ArrayList::new,
-                List::add,
+    /**
+     * Creates a {@link Collector} which accumulates elements from a {@link Stream} into a
+     * {@link List} and at the same time sorts them according to the supplied {@link Comparator}.
+     *
+     * @param comparator A {@link Comparator} used to compare and sort the elements from the
+     *                   {@link Stream}.
+     * @param <T>        The type of the elements in the {@link Stream}.
+     * @return Returns a new {@link Collector} which creates an ordered {@link List} based on the
+     * supplied {@link Comparator} with elements from a {@link Stream}.
+     */
+    public static <T> Collector<T, ?, List<T>> toOrderedList(Comparator<T> comparator) {
+        return toOrderedList(ArrayList::new, comparator);
+    }
+
+    /**
+     * Creates a {@link Collector} which accumulates elements from a {@link Stream} into a
+     * {@link List} and at the same time sorts them according to the supplied {@link Comparator}.
+     * The {@link List} is created by the {@link Supplier listSupplier}.
+     *
+     * @param listSupplier Creates a {@link List} of the desired type.
+     * @param comparator   A {@link Comparator} used to compare and sort the elements from the
+     *                     {@link Stream}.
+     * @param <T>          The type of the elements in the {@link Stream}.
+     * @param <L>          The type of the {@link List} created by the {@link Supplier listSupplier}.
+     * @return Returns a new {@link Collector} which creates an ordered {@link List} of the desired
+     * type based on the supplied {@link Comparator} with the elements from a {@link Stream}.
+     */
+    public static <T, L extends List<T>> Collector<T, ?, L> toOrderedList(Supplier<L> listSupplier, Comparator<T> comparator) {
+        return new CollectorImpl<T, L, L>(
+                listSupplier,
+                L::add,
                 list -> {
                     Collections.sort(list, comparator);
                     return list;
@@ -58,9 +119,34 @@ public class Collectors {
         );
     }
 
-    public static <T extends Comparable<T>> Collector<T, ?, List<T>> toOrdereredList() {
-        return new CollectorImpl<T, List<T>, List<T>>(
-                ArrayList::new,
+    /**
+     * Creates a {@link Collector} which accumulates elements from a {@link Stream} into a
+     * {@link List} and at the same type sorts them according to their natural order. The items in
+     * the {@link Stream} have to implement {@link Comparable} for this {@link Collector} to work.
+     *
+     * @param <T> The type of the elements in the {@link Stream}. Must extend {@link Comparable}.
+     * @return Returns a new {@link Collector} which creates a new ordered {@link List} based on the
+     * natural order of the elements from a {@link Stream}.
+     */
+    public static <T extends Comparable<T>> Collector<T, ?, List<T>> toOrderedList() {
+        return toOrderedList(ArrayList::new);
+    }
+
+    /**
+     * Creates a {@link Collector} which accumulates elements from a {@link Stream} into a
+     * {@link List} of the desired type and at the same type sorts them according to their natural
+     * order. The items in the {@link Stream} have to implement {@link Comparable} for this
+     * {@link Collector} to work.
+     *
+     * @param listSupplier A function which creates a new {@link List} of the desired type.
+     * @param <T>          The type of the elements in the {@link Stream}. Must extends {@link Comparable}.
+     * @param <L>          The type of the {@link List} created by the {@link Supplier listSupplier}.
+     * @return Returns a new {@link Collector} which creates a new ordered {@link List} of the
+     * desired type based on the natural order of the elements from a {@link Stream}.
+     */
+    public static <T extends Comparable<T>, L extends List<T>> Collector<T, ?, L> toOrderedList(Supplier<L> listSupplier) {
+        return new CollectorImpl<T, L, L>(
+                listSupplier,
                 List::add,
                 list -> {
                     Collections.sort(list);
@@ -69,24 +155,30 @@ public class Collectors {
         );
     }
 
+    /**
+     * Creates a {@link Collector} which accumulates elements from a {@link Stream} into a
+     * {@link Set}.
+     *
+     * @param <T> The type of the elements in the {@link Stream}.
+     * @return Returns a new {@link Collector} which creates a {@link Set} from the elements of a
+     * {@link Stream}.
+     */
     public static <T> Collector<T, ?, Set<T>> toSet() {
-        return new CollectorImpl<T, Set<T>, Set<T>>(
-                HashSet::new,
-                Set::add,
-                i -> i
-        );
+        return toSet(ArraySet::new);
     }
 
-    public static <T> Collector<T, ?, Long> toCount() {
-        return new CollectorImpl<>(
-                Counter::new,
-                (c, t) -> c.increment(),
-                Counter::getCount
-        );
-    }
-
-    public static <T, L extends Set<T>> Collector<T, ?, L> toSet(Supplier<L> setSupplier) {
-        return new CollectorImpl<T, L, L>(
+    /**
+     * Creates a {@link Collector} which accumulates elements from a {@link Stream} into a
+     * {@link Set} of the desired type.
+     *
+     * @param setSupplier A function which creates a new {@link Set} of the desired type.
+     * @param <T> The type of the elements in the {@link Stream}.
+     * @param <S> The type of the {@link Set} created by the {@link Supplier setSupplier}.
+     * @return Returns a new {@link Collector} which creates a {@link Set} of the desired type from
+     * the elements of a {@link Stream}.
+     */
+    public static <T, S extends Set<T>> Collector<T, ?, S> toSet(Supplier<S> setSupplier) {
+        return new CollectorImpl<T, S, S>(
                 setSupplier,
                 Set::add,
                 i -> i
@@ -286,14 +378,6 @@ public class Collectors {
                 () -> new StringJoiner(delimiter, prefix, suffix),
                 StringJoiner::add,
                 StringJoiner::toString
-        );
-    }
-
-    public static <T> Collector<T, ?, Collection<T>> appendTo(Collection<T> collection) {
-        return new CollectorImpl<>(
-                () -> collection,
-                Collection::add,
-                i -> i
         );
     }
 }

@@ -5,6 +5,7 @@ import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStreamCompat;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStream;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStreamCompat;
 import com.github.wrdlbrnft.streamcompat.function.CharBinaryOperator;
+import com.github.wrdlbrnft.streamcompat.function.CharConsumer;
 import com.github.wrdlbrnft.streamcompat.function.CharFunction;
 import com.github.wrdlbrnft.streamcompat.function.CharPredicate;
 import com.github.wrdlbrnft.streamcompat.function.CharToDoubleFunction;
@@ -16,7 +17,6 @@ import com.github.wrdlbrnft.streamcompat.function.ObjCharConsumer;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStream;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStreamCompat;
-import com.github.wrdlbrnft.streamcompat.iterator.primtive.CharIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.base.BaseIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.CharChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.ChildIterator;
@@ -24,18 +24,21 @@ import com.github.wrdlbrnft.streamcompat.iterator.child.DoubleChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.FloatChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.IntChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.LongChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.primtive.CharIterator;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStream;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStreamCompat;
 import com.github.wrdlbrnft.streamcompat.stream.Stream;
 import com.github.wrdlbrnft.streamcompat.stream.StreamCompat;
-import com.github.wrdlbrnft.streamcompat.util.OptionalCharacter;
-import com.github.wrdlbrnft.streamcompat.util.OptionalDouble;
+import com.github.wrdlbrnft.streamcompat.optionals.OptionalCharacter;
+import com.github.wrdlbrnft.streamcompat.optionals.OptionalDouble;
 import com.github.wrdlbrnft.streamcompat.util.Utils;
 
 /**
  * Created by kapeller on 21/03/16.
  */
 class CharacterStreamImpl implements CharacterStream {
+
+    private static final int DEFAULT_ARRAY_SIZE = 16;
 
     private final CharIterator mIterator;
 
@@ -148,6 +151,16 @@ class CharacterStreamImpl implements CharacterStream {
     }
 
     @Override
+    public void forEach(CharConsumer action) {
+        Utils.requireNonNull(action);
+
+        while (mIterator.hasNext()) {
+            final char value = mIterator.nextChar();
+            action.accept(value);
+        }
+    }
+
+    @Override
     public Stream<Character> boxed() {
         return mapToObj(Character::valueOf);
     }
@@ -201,7 +214,6 @@ class CharacterStreamImpl implements CharacterStream {
         return sink;
     }
 
-    @Override
     public char sum() {
         return reduce((char) 0, (a, b) -> (char) (a + b));
     }
@@ -221,7 +233,6 @@ class CharacterStreamImpl implements CharacterStream {
         return mapToLong(i -> 1L).sum();
     }
 
-    @Override
     public OptionalDouble average() {
         final long[] avg = collect(() -> new long[2],
                 (ll, i) -> {
@@ -269,6 +280,27 @@ class CharacterStreamImpl implements CharacterStream {
             }
         }
         return true;
+    }
+
+    @Override
+    public char[] toArray() {
+        char[] tmp = new char[DEFAULT_ARRAY_SIZE];
+        int index = 0;
+        while (mIterator.hasNext()) {
+            final char c = mIterator.nextChar();
+
+            if (index >= tmp.length) {
+                final char[] newArray = new char[tmp.length * 2];
+                System.arraycopy(tmp, 0, newArray, 0, tmp.length);
+                tmp = newArray;
+            }
+
+            tmp[index++] = c;
+        }
+
+        final char[] result = new char[index];
+        System.arraycopy(tmp, 0, result, 0, index);
+        return result;
     }
 
     private static class DummyIterator extends BaseIterator<Character> implements CharIterator {

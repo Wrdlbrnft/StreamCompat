@@ -4,6 +4,7 @@ import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStream;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStream;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStream;
 import com.github.wrdlbrnft.streamcompat.function.IntBinaryOperator;
+import com.github.wrdlbrnft.streamcompat.function.IntConsumer;
 import com.github.wrdlbrnft.streamcompat.function.IntFunction;
 import com.github.wrdlbrnft.streamcompat.function.IntPredicate;
 import com.github.wrdlbrnft.streamcompat.function.IntToCharFunction;
@@ -16,37 +17,180 @@ import com.github.wrdlbrnft.streamcompat.function.Supplier;
 import com.github.wrdlbrnft.streamcompat.iterator.primtive.IntIterator;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStream;
 import com.github.wrdlbrnft.streamcompat.stream.Stream;
-import com.github.wrdlbrnft.streamcompat.util.OptionalDouble;
-import com.github.wrdlbrnft.streamcompat.util.OptionalInt;
+import com.github.wrdlbrnft.streamcompat.optionals.OptionalDouble;
+import com.github.wrdlbrnft.streamcompat.optionals.OptionalInt;
 
 /**
- * Created by kapeller on 21/03/16.
+ * The primitive version of a {@link Stream} which contains a sequence of {@code int} values.
  */
 public interface IntStream extends Iterable<Integer> {
+
+    /**
+     *
+     * @param predicate
+     * @return
+     */
     IntStream filter(IntPredicate predicate);
+
+    /**
+     *
+     * @param mapper
+     * @return
+     */
     IntStream map(IntUnaryOperator mapper);
+
+    /**
+     *
+     * @param mapper
+     * @return
+     */
     IntStream flatMap(IntFunction<? extends IntStream> mapper);
+
+    /**
+     *
+     * @param mapper
+     * @param <U>
+     * @return
+     */
     <U> Stream<U> mapToObj(IntFunction<? extends U> mapper);
+
+    /**
+     *
+     * @param mapper
+     * @return
+     */
     LongStream mapToLong(IntToLongFunction mapper);
+
+    /**
+     *
+     * @param mapper
+     * @return
+     */
     DoubleStream mapToDouble(IntToDoubleFunction mapper);
+
+    /**
+     *
+     * @param mapper
+     * @return
+     */
     FloatStream mapToFloat(IntToFloatFunction mapper);
+
+    /**
+     *
+     * @param mapper
+     * @return
+     */
     CharacterStream mapToChar(IntToCharFunction mapper);
+
+    /**
+     *
+     * @return
+     */
     Stream<Integer> boxed();
+
+    /**
+     *
+     * @param limit
+     * @return
+     */
     IntStream limit(long limit);
+
+    /**
+     *
+     * @param identity
+     * @param op
+     * @return
+     */
     int reduce(int identity, IntBinaryOperator op);
+
+    /**
+     *
+     * @param op
+     * @return
+     */
     OptionalInt reduce(IntBinaryOperator op);
+
+    /**
+     *
+     * @param supplier
+     * @param accumulator
+     * @param <R>
+     * @return
+     */
     <R> R collect(Supplier<R> supplier, ObjIntConsumer<R> accumulator);
+
+    /**
+     *
+     * @return
+     */
     int sum();
+
+    /**
+     *
+     * @return
+     */
     OptionalInt min();
+
+    /**
+     *
+     * @return
+     */
     OptionalInt max();
+
+    /**
+     *
+     * @return
+     */
     long count();
+
+    /**
+     *
+     * @return
+     */
     OptionalDouble average();
+
+    /**
+     *
+     * @return
+     */
     OptionalInt findFirst();
 
+    /**
+     *
+     * @param predicate
+     * @return
+     */
     boolean anyMatch(IntPredicate predicate);
+
+    /**
+     *
+     * @param predicate
+     * @return
+     */
     boolean allMatch(IntPredicate predicate);
+
+    /**
+     *
+     * @param predicate
+     * @return
+     */
     boolean noneMatch(IntPredicate predicate);
 
-    @Override
+    /**
+     *
+     * @return
+     */
+    int[] toArray();
+
+    /**
+     *
+     * @return
+     */
     IntIterator iterator();
+
+    /**
+     *
+     * @param action
+     */
+    void forEach(IntConsumer action);
 }

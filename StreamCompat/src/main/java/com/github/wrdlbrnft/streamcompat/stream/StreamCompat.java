@@ -17,7 +17,7 @@ import java.util.Iterator;
  */
 public class StreamCompat {
 
-    private static final Stream<?> EMPTY_STREAM = new StreamImpl<>(Collections.emptyList().iterator());
+    private static final Stream<?> EMPTY_STREAM = new StreamImpl<>(Utils.emptyIterator());
 
     @SuppressWarnings("unchecked")
     public static <S> Stream<S> empty() {
@@ -55,31 +55,6 @@ public class StreamCompat {
     @SafeVarargs
     public static <S> Stream<S> of(S... items) {
         final Iterator<S> iterator = new ArrayIterator<>(items);
-        return new StreamImpl<>(iterator);
-    }
-
-    public static Stream<Character> of(char[] items) {
-        final Iterator<Character> iterator = new CharArrayIterator(items);
-        return new StreamImpl<>(iterator);
-    }
-
-    public static Stream<Integer> of(int[] items) {
-        final Iterator<Integer> iterator = new IntArrayIterator(items);
-        return new StreamImpl<>(iterator);
-    }
-
-    public static Stream<Long> of(long[] items) {
-        final Iterator<Long> iterator = new LongArrayIterator(items);
-        return new StreamImpl<>(iterator);
-    }
-
-    public static Stream<Float> of(float[] items) {
-        final Iterator<Float> iterator = new FloatArrayIterator(items);
-        return new StreamImpl<>(iterator);
-    }
-
-    public static Stream<Double> of(double[] items) {
-        final Iterator<Double> iterator = new DoubleArrayIterator(items);
         return new StreamImpl<>(iterator);
     }
 }

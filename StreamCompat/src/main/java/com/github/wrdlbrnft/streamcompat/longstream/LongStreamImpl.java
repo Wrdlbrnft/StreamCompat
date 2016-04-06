@@ -7,6 +7,7 @@ import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStreamCompat;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStream;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStreamCompat;
 import com.github.wrdlbrnft.streamcompat.function.LongBinaryOperator;
+import com.github.wrdlbrnft.streamcompat.function.LongConsumer;
 import com.github.wrdlbrnft.streamcompat.function.LongFunction;
 import com.github.wrdlbrnft.streamcompat.function.LongPredicate;
 import com.github.wrdlbrnft.streamcompat.function.LongToCharFunction;
@@ -18,7 +19,6 @@ import com.github.wrdlbrnft.streamcompat.function.ObjLongConsumer;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStream;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStreamCompat;
-import com.github.wrdlbrnft.streamcompat.iterator.primtive.LongIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.base.BaseIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.CharChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.ChildIterator;
@@ -26,10 +26,11 @@ import com.github.wrdlbrnft.streamcompat.iterator.child.DoubleChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.FloatChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.IntChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.LongChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.primtive.LongIterator;
 import com.github.wrdlbrnft.streamcompat.stream.Stream;
 import com.github.wrdlbrnft.streamcompat.stream.StreamCompat;
-import com.github.wrdlbrnft.streamcompat.util.OptionalDouble;
-import com.github.wrdlbrnft.streamcompat.util.OptionalLong;
+import com.github.wrdlbrnft.streamcompat.optionals.OptionalDouble;
+import com.github.wrdlbrnft.streamcompat.optionals.OptionalLong;
 import com.github.wrdlbrnft.streamcompat.util.Utils;
 
 /**
@@ -37,6 +38,7 @@ import com.github.wrdlbrnft.streamcompat.util.Utils;
  */
 class LongStreamImpl implements LongStream {
 
+    private static final int DEFAULT_ARRAY_SIZE = 16;
     private final LongIterator mIterator;
 
     LongStreamImpl(LongIterator iterator) {
@@ -78,8 +80,8 @@ class LongStreamImpl implements LongStream {
         final LongIterator[] buffer = new LongIterator[1];
         return new LongStreamImpl(new LongChildIterator<>(
                 () -> {
-                    if(buffer[0] == null || !buffer[0].hasNext()) {
-                        if(!mIterator.hasNext()) {
+                    if (buffer[0] == null || !buffer[0].hasNext()) {
+                        if (!mIterator.hasNext()) {
                             return LongStreamCompat.EMPTY_ITERATOR;
                         }
                         buffer[0] = mapper.apply(mIterator.nextLong()).iterator();
@@ -147,13 +149,23 @@ class LongStreamImpl implements LongStream {
     }
 
     @Override
+    public void forEach(LongConsumer action) {
+        Utils.requireNonNull(action);
+
+        while (mIterator.hasNext()) {
+            final long value = mIterator.nextLong();
+            action.accept(value);
+        }
+    }
+
+    @Override
     public Stream<Long> boxed() {
         return mapToObj(Long::valueOf);
     }
 
     @Override
-    public LongStream limit(long limit) {
-        final long[] buffer = {0, limit};
+    public LongStream limit(long maxSize) {
+        final long[] buffer = {0, maxSize};
         return new LongStreamImpl(new LongChildIterator<>(
                 () -> mIterator,
                 iterator -> buffer[0] < buffer[1] && mIterator.hasNext(),
@@ -278,6 +290,27 @@ class LongStreamImpl implements LongStream {
         }
 
         return true;
+    }
+
+    @Override
+    public long[] toArray() {
+        long[] tmp = new long[DEFAULT_ARRAY_SIZE];
+        int index = 0;
+        while (mIterator.hasNext()) {
+            final long c = mIterator.nextLong();
+
+            if (index >= tmp.length) {
+                final long[] newArray = new long[tmp.length * 2];
+                System.arraycopy(tmp, 0, newArray, 0, tmp.length);
+                tmp = newArray;
+            }
+
+            tmp[index++] = c;
+        }
+
+        final long[] result = new long[index];
+        System.arraycopy(tmp, 0, result, 0, index);
+        return result;
     }
 
     private static class DummyIterator extends BaseIterator<Long> implements LongIterator {

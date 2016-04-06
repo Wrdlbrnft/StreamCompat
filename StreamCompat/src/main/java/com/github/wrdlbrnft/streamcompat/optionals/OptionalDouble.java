@@ -1,8 +1,9 @@
-package com.github.wrdlbrnft.streamcompat.util;
+package com.github.wrdlbrnft.streamcompat.optionals;
 
 import com.github.wrdlbrnft.streamcompat.function.DoubleConsumer;
 import com.github.wrdlbrnft.streamcompat.function.DoubleSupplier;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
+import com.github.wrdlbrnft.streamcompat.util.Utils;
 
 import java.util.NoSuchElementException;
 

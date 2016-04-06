@@ -8,7 +8,9 @@ import com.github.wrdlbrnft.streamcompat.floatstream.FloatStream;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStreamCompat;
 import com.github.wrdlbrnft.streamcompat.function.BiConsumer;
 import com.github.wrdlbrnft.streamcompat.function.BinaryOperator;
+import com.github.wrdlbrnft.streamcompat.function.Consumer;
 import com.github.wrdlbrnft.streamcompat.function.Function;
+import com.github.wrdlbrnft.streamcompat.function.IntFunction;
 import com.github.wrdlbrnft.streamcompat.function.Predicate;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
 import com.github.wrdlbrnft.streamcompat.function.ToCharFunction;
@@ -18,11 +20,6 @@ import com.github.wrdlbrnft.streamcompat.function.ToIntFunction;
 import com.github.wrdlbrnft.streamcompat.function.ToLongFunction;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStream;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStreamCompat;
-import com.github.wrdlbrnft.streamcompat.iterator.primtive.CharIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.primtive.DoubleIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.primtive.FloatIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.primtive.IntIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.primtive.LongIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.base.BaseIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.CharChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.ChildIterator;
@@ -30,9 +27,14 @@ import com.github.wrdlbrnft.streamcompat.iterator.child.DoubleChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.FloatChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.IntChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.LongChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.primtive.CharIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.primtive.DoubleIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.primtive.FloatIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.primtive.IntIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.primtive.LongIterator;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStream;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStreamCompat;
-import com.github.wrdlbrnft.streamcompat.util.Optional;
+import com.github.wrdlbrnft.streamcompat.optionals.Optional;
 import com.github.wrdlbrnft.streamcompat.util.Utils;
 
 import java.util.Comparator;
@@ -264,8 +266,8 @@ class StreamImpl<T> implements Stream<T> {
     }
 
     @Override
-    public Stream<T> limit(long limit) {
-        final long[] buffer = {0, limit};
+    public Stream<T> limit(long maxSize) {
+        final long[] buffer = {0, maxSize};
         return new StreamImpl<>(new ChildIterator<>(
                 () -> mIterator,
                 iterator -> buffer[0] < buffer[1] && mIterator.hasNext(),
@@ -360,6 +362,13 @@ class StreamImpl<T> implements Stream<T> {
     }
 
     @Override
+    public T[] toArray(IntFunction<T[]> generator) {
+        Utils.requireNonNull(generator);
+
+        return collect(Collectors.toArray(generator));
+    }
+
+    @Override
     public Optional<T> findFirst() {
         while (mIterator.hasNext()) {
             final T item = mIterator.next();
@@ -374,6 +383,16 @@ class StreamImpl<T> implements Stream<T> {
     @Override
     public Iterator<T> iterator() {
         return mIterator;
+    }
+
+    @Override
+    public void forEach(Consumer<? super T> action) {
+        Utils.requireNonNull(action);
+
+        while (mIterator.hasNext()) {
+            final T item = mIterator.next();
+            action.accept(item);
+        }
     }
 
     private static class DummyIterator<T> extends BaseIterator<T> {

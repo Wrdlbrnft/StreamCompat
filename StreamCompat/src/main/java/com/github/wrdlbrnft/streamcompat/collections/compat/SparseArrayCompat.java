@@ -1,9 +1,10 @@
-package com.github.wrdlbrnft.streamcompat.util;
+package com.github.wrdlbrnft.streamcompat.collections.compat;
 
 import android.util.SparseArray;
 
 import com.github.wrdlbrnft.streamcompat.function.IntFunction;
 import com.github.wrdlbrnft.streamcompat.function.IntObjFunction;
+import com.github.wrdlbrnft.streamcompat.util.Utils;
 
 /**
  * Created by kapeller on 22/03/16.

@@ -1,37 +1,38 @@
-package com.github.wrdlbrnft.streamcompat.util;
+package com.github.wrdlbrnft.streamcompat.optionals;
 
-import com.github.wrdlbrnft.streamcompat.function.IntConsumer;
-import com.github.wrdlbrnft.streamcompat.function.IntSupplier;
+import com.github.wrdlbrnft.streamcompat.function.CharConsumer;
+import com.github.wrdlbrnft.streamcompat.function.CharSupplier;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
+import com.github.wrdlbrnft.streamcompat.util.Utils;
 
 import java.util.NoSuchElementException;
 
-public class OptionalInt {
+public class OptionalCharacter {
 
-    private static final OptionalInt EMPTY = new OptionalInt();
+    private static final OptionalCharacter EMPTY = new OptionalCharacter();
     
     private final boolean mIsPresent;
-    private final int mValue;
+    private final char mValue;
 
-    private OptionalInt() {
+    private OptionalCharacter() {
         mIsPresent = false;
         mValue = 0;
     }
     
-    public static OptionalInt empty() {
+    public static OptionalCharacter empty() {
         return EMPTY;
     }
     
-    private OptionalInt(int value) {
+    private OptionalCharacter(char value) {
         mIsPresent = true;
         mValue = value;
     }
     
-    public static OptionalInt of(int value) {
-        return new OptionalInt(value);
+    public static OptionalCharacter of(char value) {
+        return new OptionalCharacter(value);
     }
     
-    public int getAsInt() {
+    public char getAsCharacter() {
         if (!mIsPresent) {
             throw new NoSuchElementException("No value present");
         }
@@ -42,21 +43,21 @@ public class OptionalInt {
         return mIsPresent;
     }
 
-    public void ifPresent(IntConsumer consumer) {
+    public void ifPresent(CharConsumer consumer) {
         if (mIsPresent) {
             consumer.accept(mValue);
         }
     }
 
-    public int orElse(int other) {
+    public char orElse(char other) {
         return mIsPresent ? mValue : other;
     }
 
-    public int orElseGet(IntSupplier other) {
-        return mIsPresent ? mValue : other.getAsInt();
+    public char orElseGet(CharSupplier other) {
+        return mIsPresent ? mValue : other.getAsChar();
     }
 
-    public<X extends Throwable> int orElseThrow(Supplier<X> exceptionSupplier) throws X {
+    public<X extends Throwable> char orElseThrow(Supplier<X> exceptionSupplier) throws X {
         if (mIsPresent) {
             return mValue;
         } else {
@@ -70,11 +71,11 @@ public class OptionalInt {
             return true;
         }
 
-        if (!(obj instanceof OptionalInt)) {
+        if (!(obj instanceof OptionalCharacter)) {
             return false;
         }
 
-        OptionalInt other = (OptionalInt) obj;
+        OptionalCharacter other = (OptionalCharacter) obj;
         return (mIsPresent && other.mIsPresent)
                 ? mValue == other.mValue
                 : mIsPresent == other.mIsPresent;
@@ -88,7 +89,7 @@ public class OptionalInt {
     @Override
     public String toString() {
         return mIsPresent
-                ? String.format("OptionalInt[%s]", mValue)
-                : "OptionalInt.empty";
+                ? String.format("OptionalChar[%s]", mValue)
+                : "OptionalChar.empty";
     }
 }

@@ -1,37 +1,38 @@
-package com.github.wrdlbrnft.streamcompat.util;
+package com.github.wrdlbrnft.streamcompat.optionals;
 
-import com.github.wrdlbrnft.streamcompat.function.FloatConsumer;
-import com.github.wrdlbrnft.streamcompat.function.FloatSupplier;
+import com.github.wrdlbrnft.streamcompat.function.LongConsumer;
+import com.github.wrdlbrnft.streamcompat.function.LongSupplier;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
+import com.github.wrdlbrnft.streamcompat.util.Utils;
 
 import java.util.NoSuchElementException;
 
-public class OptionalFloat {
+public final class OptionalLong {
 
-    private static final OptionalFloat EMPTY = new OptionalFloat();
+    private static final OptionalLong EMPTY = new OptionalLong();
 
     private final boolean mIsPresent;
-    private final float mValue;
+    private final long mValue;
 
-    private OptionalFloat() {
+    private OptionalLong() {
         this.mIsPresent = false;
-        this.mValue = Float.NaN;
+        this.mValue = 0;
     }
 
-    public static OptionalFloat empty() {
+    public static OptionalLong empty() {
         return EMPTY;
     }
 
-    private OptionalFloat(float value) {
+    private OptionalLong(long value) {
         this.mIsPresent = true;
         this.mValue = value;
     }
 
-    public static OptionalFloat of(float value) {
-        return new OptionalFloat(value);
+    public static OptionalLong of(long value) {
+        return new OptionalLong(value);
     }
 
-    public float getAsFloat() {
+    public long getAsLong() {
         if (!mIsPresent) {
             throw new NoSuchElementException("No value present");
         }
@@ -42,21 +43,21 @@ public class OptionalFloat {
         return mIsPresent;
     }
 
-    public void ifPresent(FloatConsumer consumer) {
+    public void ifPresent(LongConsumer consumer) {
         if (mIsPresent) {
             consumer.accept(mValue);
         }
     }
 
-    public float orElse(float other) {
+    public long orElse(long other) {
         return mIsPresent ? mValue : other;
     }
 
-    public float orElseGet(FloatSupplier other) {
-        return mIsPresent ? mValue : other.getAsFloat();
+    public long orElseGet(LongSupplier other) {
+        return mIsPresent ? mValue : other.getAsLong();
     }
 
-    public<X extends Throwable> float orElseThrow(Supplier<X> exceptionSupplier) throws X {
+    public <X extends Throwable> long orElseThrow(Supplier<X> exceptionSupplier) throws X {
         if (mIsPresent) {
             return mValue;
         } else {
@@ -70,13 +71,13 @@ public class OptionalFloat {
             return true;
         }
 
-        if (!(obj instanceof OptionalFloat)) {
+        if (!(obj instanceof OptionalLong)) {
             return false;
         }
 
-        OptionalFloat other = (OptionalFloat) obj;
+        OptionalLong other = (OptionalLong) obj;
         return (mIsPresent && other.mIsPresent)
-                ? Float.compare(mValue, other.mValue) == 0
+                ? mValue == other.mValue
                 : mIsPresent == other.mIsPresent;
     }
 
@@ -88,7 +89,7 @@ public class OptionalFloat {
     @Override
     public String toString() {
         return mIsPresent
-                ? String.format("OptionalFloat[%s]", mValue)
-                : "OptionalFloat.empty";
+                ? String.format("OptionalLong[%s]", mValue)
+                : "OptionalLong.empty";
     }
 }

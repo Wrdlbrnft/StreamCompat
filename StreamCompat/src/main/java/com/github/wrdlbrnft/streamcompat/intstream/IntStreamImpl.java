@@ -7,6 +7,7 @@ import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStreamCompat;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStream;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStreamCompat;
 import com.github.wrdlbrnft.streamcompat.function.IntBinaryOperator;
+import com.github.wrdlbrnft.streamcompat.function.IntConsumer;
 import com.github.wrdlbrnft.streamcompat.function.IntFunction;
 import com.github.wrdlbrnft.streamcompat.function.IntPredicate;
 import com.github.wrdlbrnft.streamcompat.function.IntToCharFunction;
@@ -28,8 +29,8 @@ import com.github.wrdlbrnft.streamcompat.longstream.LongStream;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStreamCompat;
 import com.github.wrdlbrnft.streamcompat.stream.Stream;
 import com.github.wrdlbrnft.streamcompat.stream.StreamCompat;
-import com.github.wrdlbrnft.streamcompat.util.OptionalDouble;
-import com.github.wrdlbrnft.streamcompat.util.OptionalInt;
+import com.github.wrdlbrnft.streamcompat.optionals.OptionalDouble;
+import com.github.wrdlbrnft.streamcompat.optionals.OptionalInt;
 import com.github.wrdlbrnft.streamcompat.util.Utils;
 
 /**
@@ -37,6 +38,7 @@ import com.github.wrdlbrnft.streamcompat.util.Utils;
  */
 class IntStreamImpl implements IntStream {
 
+    private static final int DEFAULT_ARRAY_SIZE = 16;
     private final IntIterator mIterator;
 
     IntStreamImpl(IntIterator iterator) {
@@ -144,6 +146,16 @@ class IntStreamImpl implements IntStream {
     @Override
     public IntIterator iterator() {
         return mIterator;
+    }
+
+    @Override
+    public void forEach(IntConsumer action) {
+        Utils.requireNonNull(action);
+
+        while (mIterator.hasNext()) {
+            final int i = mIterator.nextInt();
+            action.accept(i);
+        }
     }
 
     @Override
@@ -268,6 +280,27 @@ class IntStreamImpl implements IntStream {
             }
         }
         return true;
+    }
+
+    @Override
+    public int[] toArray() {
+        int[] tmp = new int[DEFAULT_ARRAY_SIZE];
+        int index = 0;
+        while (mIterator.hasNext()) {
+            final int c = mIterator.nextInt();
+
+            if (index >= tmp.length) {
+                final int[] newArray = new int[tmp.length * 2];
+                System.arraycopy(tmp, 0, newArray, 0, tmp.length);
+                tmp = newArray;
+            }
+
+            tmp[index++] = c;
+        }
+
+        final int[] result = new int[index];
+        System.arraycopy(tmp, 0, result, 0, index);
+        return result;
     }
 
     private static class DummyIterator extends BaseIterator<Integer> implements IntIterator {

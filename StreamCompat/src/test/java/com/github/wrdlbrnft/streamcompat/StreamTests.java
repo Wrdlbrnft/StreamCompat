@@ -1,9 +1,6 @@
 package com.github.wrdlbrnft.streamcompat;
 
-import android.support.v4.util.LongSparseArray;
-
 import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStreamCompat;
-import com.github.wrdlbrnft.streamcompat.stream.Collectors;
 import com.github.wrdlbrnft.streamcompat.stream.StreamCompat;
 
 import org.junit.Assert;
@@ -15,28 +12,12 @@ import org.junit.Test;
 public class StreamTests {
 
     @Test
-    public void testBasic() {
-        final LongSparseArray<Long> array = StreamCompat.of("ASDF", "test", "wwwew", "z", "qqq", "sdalgekasdgkl", "q[rgeeu0", "zflb;ndz")
-                .map(StringBuilder::new)
-                .map(StringBuilder::reverse)
-                .map(StringBuilder::toString)
+    public void testCharacterStreamToArray() {
+        final char[] actual = StreamCompat.of("Android", " ", "Google")
                 .flatMapToChar(text -> CharacterStreamCompat.of(text.toCharArray()))
-                .boxed()
-                .collect(Collectors.groupingInLongSparseArray(Character::hashCode, Collectors.toCount()));
+                .toArray();
 
-        Assert.assertEquals(1L, array.get('b').longValue());
-    }
-
-    @Test
-    public void testConcat() {
-        final long count = StreamCompat.concat(
-                StreamCompat.of("ASDF", "test", "wwq    wew", "z"),
-                StreamCompat.of("qqq", "sdalgekasdgkl"),
-                StreamCompat.of("q[rgeeu0", "zflb;ndz"))
-                .flatMapToChar(text -> CharacterStreamCompat.of(text.toCharArray()))
-                .filter(c -> c == 'q')
-                .count();
-
-        Assert.assertEquals(5L, count);
+        final char[] expected = new char[]{'A', 'n', 'd', 'r', 'o', 'i', 'd', ' ', 'G', 'o', 'o', 'g', 'l', 'e'};
+        Assert.assertArrayEquals(expected, actual);
     }
 }

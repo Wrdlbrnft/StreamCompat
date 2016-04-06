@@ -1,23 +1,20 @@
-package com.github.wrdlbrnft.streamcompat.util;
+package com.github.wrdlbrnft.streamcompat.collections.compat;
 
-import android.support.v4.util.LongSparseArray;
-import android.util.SparseArray;
+import com.github.wrdlbrnft.streamcompat.function.BiFunction;
+import com.github.wrdlbrnft.streamcompat.function.Function;
+import com.github.wrdlbrnft.streamcompat.util.Utils;
 
-import com.github.wrdlbrnft.streamcompat.function.LongFunction;
-import com.github.wrdlbrnft.streamcompat.function.LongObjFunction;
+import java.util.Map;
 
-/**
- * Created by kapeller on 22/03/16.
- */
-public class LongSparseArrayCompat {
+public class MapCompat {
 
-    public static <V> V compute(LongSparseArray<V> map, long key, LongObjFunction<? super V, ? extends V> remappingFunction) {
+    public static <K, V> V compute(Map<K, V> map, K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
         Utils.requireNonNull(map);
         Utils.requireNonNull(remappingFunction);
         final V oldValue = map.get(key);
         final V newValue = remappingFunction.apply(key, oldValue);
         if (newValue == null) {
-            if (oldValue != null) {
+            if (oldValue != null || map.containsKey(key)) {
                 map.remove(key);
             }
 
@@ -28,18 +25,17 @@ public class LongSparseArrayCompat {
         return newValue;
     }
 
-    public static <V> V putIfAbsent(LongSparseArray<V> map, long key, V value) {
+    public static <K, V> V putIfAbsent(Map<K, V> map, K key, V value) {
         final V existingValue = map.get(key);
 
         if (existingValue != null) {
             return existingValue;
         }
 
-        map.put(key, value);
-        return null;
+        return map.put(key, value);
     }
 
-    public static <V> V computeIfAbsent(LongSparseArray<V> map, long key, LongFunction<? extends V> mappingFunction) {
+    public static <K, V> V computeIfAbsent(Map<K, V> map, K key, Function<? super K, ? extends V> mappingFunction) {
         Utils.requireNonNull(map);
         Utils.requireNonNull(mappingFunction);
         V v;
@@ -54,7 +50,7 @@ public class LongSparseArrayCompat {
         return v;
     }
 
-    public static <V> V computeIfPresent(LongSparseArray<V> map, long key, LongObjFunction<? super V, ? extends V> remappingFunction) {
+    public static <K, V> V computeIfPresent(Map<K, V> map, K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
         Utils.requireNonNull(map);
         Utils.requireNonNull(remappingFunction);
         V oldValue;
@@ -72,13 +68,14 @@ public class LongSparseArrayCompat {
         return null;
     }
 
-    public static <V> void replaceAll(LongSparseArray<V> map, LongObjFunction<? super V, ? extends V> function) {
+    public static <K, V> void replaceAll(Map<K, V> map, BiFunction<? super K, ? super V, ? extends V> function) {
         Utils.requireNonNull(map);
         Utils.requireNonNull(function);
-        for (int i = 0, count = map.size(); i < count; i++) {
-            final long key = map.keyAt(i);
-            final V value = map.valueAt(i);
-            map.setValueAt(i, function.apply(key, value));
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            final K key = entry.getKey();
+            final V value = entry.getValue();
+            final V newValue = function.apply(key, value);
+            entry.setValue(newValue);
         }
     }
 }

@@ -1,9 +1,10 @@
-package com.github.wrdlbrnft.streamcompat.util;
+package com.github.wrdlbrnft.streamcompat.optionals;
 
 import com.github.wrdlbrnft.streamcompat.function.Consumer;
 import com.github.wrdlbrnft.streamcompat.function.Function;
 import com.github.wrdlbrnft.streamcompat.function.Predicate;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
+import com.github.wrdlbrnft.streamcompat.util.Utils;
 
 import java.util.NoSuchElementException;
 
@@ -105,7 +106,7 @@ public class Optional<T> {
         }
 
         Optional<?> other = (Optional<?>) obj;
-        return Utils.equals(mValue, other.mValue);
+        return Utils.equal(mValue, other.mValue);
     }
 
     @Override
