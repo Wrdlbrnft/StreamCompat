@@ -2,6 +2,7 @@ package com.github.wrdlbrnft.streamcompat.stream;
 
 import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStream;
 import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStreamCompat;
+import com.github.wrdlbrnft.streamcompat.collections.ArraySet;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStream;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStreamCompat;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStream;
@@ -39,6 +40,7 @@ import com.github.wrdlbrnft.streamcompat.util.Utils;
 
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Created by kapeller on 10/03/16.
@@ -242,6 +244,30 @@ class StreamImpl<T> implements Stream<T> {
                 CharIterator::hasNext,
                 CharIterator::nextChar
         ));
+    }
+
+    @Override
+    public Stream<T> distinct(Supplier<Set<T>> setSupplier) {
+        final Set<T> set = setSupplier.get();
+        final DummyIterator<T> iterator = new DummyIterator<>();
+        return new StreamImpl<>(new ChildIterator<>(
+                () -> {
+                    while (mIterator.hasNext()) {
+                        final T value = mIterator.next();
+                        if (set.add(value)) {
+                            return iterator.newValue(value);
+                        }
+                    }
+                    return iterator;
+                },
+                Iterator::hasNext,
+                Iterator::next
+        ));
+    }
+
+    @Override
+    public Stream<T> distinct() {
+        return distinct(ArraySet::new);
     }
 
     @Override

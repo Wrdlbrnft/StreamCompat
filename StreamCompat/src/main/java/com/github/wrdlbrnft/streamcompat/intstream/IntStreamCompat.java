@@ -1,9 +1,12 @@
 package com.github.wrdlbrnft.streamcompat.intstream;
 
+import android.util.SparseArray;
+
 import com.github.wrdlbrnft.streamcompat.iterator.array.ArrayIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.array.IntArrayIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.primtive.IntIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.IntChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.primtive.IntIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.sparsearray.SparseArrayKeyIterator;
 import com.github.wrdlbrnft.streamcompat.util.EmptyIterator;
 
 import java.util.Iterator;
@@ -42,6 +45,11 @@ public class IntStreamCompat {
 
     public static IntStream of(int... values) {
         final IntIterator iterator = new IntArrayIterator(values);
+        return new IntStreamImpl(iterator);
+    }
+
+    public static <T> IntStream ofKeys(SparseArray<T> array) {
+        final IntIterator iterator = new SparseArrayKeyIterator<>(array);
         return new IntStreamImpl(iterator);
     }
 

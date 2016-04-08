@@ -20,4 +20,14 @@ public class StreamTests {
         final char[] expected = new char[]{'A', 'n', 'd', 'r', 'o', 'i', 'd', ' ', 'G', 'o', 'o', 'g', 'l', 'e'};
         Assert.assertArrayEquals(expected, actual);
     }
+
+    @Test
+    public void testDistinct() {
+        final String[] actual = StreamCompat.of("Android", "Android", " ", "Apple", "Google", "Google")
+                .distinct()
+                .toArray(String[]::new);
+
+        final String[] expected = new String[]{"Android", " ", "Apple", "Google"};
+        Assert.assertArrayEquals(expected, actual);
+    }
 }

@@ -1,16 +1,16 @@
 package com.github.wrdlbrnft.streamcompat.stream;
 
+import android.support.v4.util.LongSparseArray;
+import android.util.SparseArray;
+
 import com.github.wrdlbrnft.streamcompat.iterator.array.ArrayIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.array.CharArrayIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.array.DoubleArrayIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.array.FloatArrayIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.array.IntArrayIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.array.LongArrayIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.ChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.sparsearray.LongSparseArrayValueIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.sparsearray.SparseArrayValueIterator;
 import com.github.wrdlbrnft.streamcompat.util.Utils;
 
-import java.util.Collections;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Created by kapeller on 10/03/16.
@@ -27,6 +27,7 @@ public class StreamCompat {
     @SafeVarargs
     public static <S> Stream<S> concat(Stream<S>... streams) {
         final Iterator<Stream<S>> iterator = new ArrayIterator<>(streams);
+        @SuppressWarnings("unchecked")
         final Iterator<S>[] buffer = new Iterator[1];
         return new StreamImpl<>(new ChildIterator<>(
                 () -> {
@@ -41,6 +42,26 @@ public class StreamCompat {
                 Iterator::hasNext,
                 Iterator::next
         ));
+    }
+
+    public static <T> Stream<T> ofValues(LongSparseArray<T> array) {
+        final Iterator<T> iterator = new LongSparseArrayValueIterator<>(array);
+        return new StreamImpl<>(iterator);
+    }
+
+    public static <T> Stream<T> ofValues(SparseArray<T> array) {
+        final Iterator<T> iterator = new SparseArrayValueIterator<>(array);
+        return new StreamImpl<>(iterator);
+    }
+
+    public static <K, V> Stream<V> ofValues(Map<K, V> map) {
+        final Iterator<V> iterator = map.values().iterator();
+        return new StreamImpl<>(iterator);
+    }
+
+    public static <K, V> Stream<K> ofKeys(Map<K, V> map) {
+        final Iterator<K> iterator = map.keySet().iterator();
+        return new StreamImpl<>(iterator);
     }
 
     public static <S> Stream<S> of(Iterable<S> collection) {

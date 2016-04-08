@@ -1,6 +1,7 @@
 package com.github.wrdlbrnft.streamcompat.stream;
 
 import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStream;
+import com.github.wrdlbrnft.streamcompat.collections.ArraySet;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStream;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStream;
 import com.github.wrdlbrnft.streamcompat.function.BiConsumer;
@@ -20,7 +21,9 @@ import com.github.wrdlbrnft.streamcompat.longstream.LongStream;
 import com.github.wrdlbrnft.streamcompat.optionals.Optional;
 
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 /**
  * A {@link Stream} contains a sequence of elements which can be filtered and transformed in a
@@ -177,6 +180,29 @@ public interface Stream<T> extends Iterable<T> {
     CharacterStream flatMapToChar(Function<? super T, ? extends CharacterStream> mapper);
 
     /**
+     * Returns a {@link Stream} which contains only distinct elements of this {@link Stream}.
+     *
+     * @param setSupplier A {@link Supplier} which creates a new empty {@link Set} which will be used
+     *                    to filter out duplicate elements in this {@link Stream}.
+     * @return Returns a new {@link Stream} which contains only distinct elements.
+     */
+    Stream<T> distinct(Supplier<Set<T>> setSupplier);
+
+    /**
+     * Returns a {@link Stream} which contains only distinct elements of this {@link Stream}.
+     * <p>
+     * For the sake of memory efficiency this operation uses an {@link ArraySet}
+     * internally to check for duplicate elements. This is the preferred option if this {@link Stream}
+     * contains up to one or two thousand elements. For a large number of elements {@link Stream#distinct(Supplier)}
+     * can be used to supply a different type of {@link Set} which prioritizes fast lookup times instead of
+     * memory efficiency like for example a {@link HashSet}.
+     * </p>
+     *
+     * @return Returns a new {@link Stream} which contains only distinct elements.
+     */
+    Stream<T> distinct();
+
+    /**
      * Collects all the elements in the {@link Stream} based on the supplied {@link Collector}.
      * <p>
      * <p>The {@link Collectors} class contains many predefined {@link Collector Collectors}.</p>
@@ -324,7 +350,7 @@ public interface Stream<T> extends Iterable<T> {
      * The returned {@link Optional} is guaranteed to contain a valid element as long as the
      * {@link Stream} is not empty.
      * </p>
-     *
+     * <p>
      * This is a terminal operation.
      *
      * @return An {@link Optional} which contains the first element of the {@link Stream} as long as
@@ -341,7 +367,7 @@ public interface Stream<T> extends Iterable<T> {
 
     /**
      * Performs the supplied action on each element in the {@link Stream}.
-     *
+     * <p>
      * <p>This is a terminal operation.</p>
      *
      * @param action An action as a {@link Consumer}.

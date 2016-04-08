@@ -1,9 +1,12 @@
 package com.github.wrdlbrnft.streamcompat.longstream;
 
+import android.support.v4.util.LongSparseArray;
+
 import com.github.wrdlbrnft.streamcompat.iterator.array.ArrayIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.array.LongArrayIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.primtive.LongIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.LongChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.sparsearray.LongSparseArrayKeyIterator;
 import com.github.wrdlbrnft.streamcompat.util.EmptyIterator;
 
 import java.util.Iterator;
@@ -42,6 +45,11 @@ public class LongStreamCompat {
 
     public static LongStream of(long... values) {
         final LongIterator iterator = new LongArrayIterator(values);
+        return new LongStreamImpl(iterator);
+    }
+
+    public static <T> LongStream ofKeys(LongSparseArray<T> array) {
+        final LongIterator iterator = new LongSparseArrayKeyIterator<>(array);
         return new LongStreamImpl(iterator);
     }
 
