@@ -15,21 +15,6 @@ final List<ViewModel> viewModels = StreamCompat.of(models)
         .collect(Collectors.toList());
 ```
 
-# Table of Contents
-
-* [Installation](#installation)
-  * [Stream Compat](#streamcompat)
-  * [Using Retrolambda](#using-retrolambda)
-  * [Using the JACK Compiler](#using-the-jack-compiler)
-* [Examples](#examples)
-* [Features](#features)
-  * [Overview](#overview)
-    * [Fully Supported Features](#fully-supported-features)
-    * [Changed Features](#changed-features)
-  * [Android-Specific Changes](#android-specific-changes)
-    * [Collector Interface](#collector-interface)
-    * [Predefined Collectors](#predefined-collectors)
-
 # Installation
 
 ## StreamCompat
@@ -37,24 +22,14 @@ final List<ViewModel> viewModels = StreamCompat.of(models)
 To use StreamCompat just add this to the dependencies closure in your build.gradle:
 
 ```
-compile 'com.github.wrdlbrnft:stream-compat:0.1.0.20'
-```
-
-If you are using Maven you can add the dependency like this:
-
-```
-<dependency>
-  <groupId>com.github.wrdlbrnft</groupId>
-  <artifactId>stream-compat</artifactId>
-  <version>0.1.0.18</version>
-</dependency>
+compile 'com.github.wrdlbrnft:stream-compat:0.1.0.22'
 ```
 
 To use method references and lambda expressions you either need to use the JACK compiler which is part of the preview build tools or if you don't want to do that you can just use Retrolambda instead!
 
 ## Using Retrolambda
 
-TO use Retrolambda just paste the following at the very top of your build.gradle:
+To use Retrolambda just paste the following at the very top of your build.gradle:
 
 ```
 buildscript {
@@ -68,9 +43,12 @@ buildscript {
 }
 ```
 
-After that you just have to add `` below all your other `apply plugin` statements:
+After that you just have to add `apply plugin: 'me.tatarka.retrolambda'` below all your other `apply plugin` statements:
 
-
+```groovy
+apply plugin: 'com.android.library' // or apply plugin: 'com.android.application'
+apply plugin: 'me.tatarka.retrolambda'
+```
 
 ## Using the JACK Compiler
 
@@ -84,7 +62,7 @@ If you do that the build.gradle of your app module should look something like th
 ```
 android {
     ...
-    buildToolsVersion "24.0.0 rc1"
+    buildToolsVersion "24.0.0 rc2"
 
     defaultConfig {
         ...
@@ -102,53 +80,31 @@ android {
 
 # Features
 
-## Overview
+## Introduction
 
-StreamCompat is not meant to be a full backport of the Stream API. The most important features are included based on an `Iterator` based implementation.
+StreamCompat is not meant to be a full backport of the Stream API. The most important features are included based on an `Iterator` based implementation. There is the basic `Stream` for dealing with objects, as well as special versions for primitive types. The full list is:
 
-### Fully Supported Features
+* `Stream`: For streaming objects
+* `IntStream`: For streaming `int` values.
+* `LongStream`: For streaming `long` values.
+* `FloatStream`: For streaming `float` values.
+* `DoubleStream`: For streaming `double` values.
+* `CharacterStream`: For streaming `char` values.
+* `ByteStream`: For streaming `byte` values.
 
-These calls work exactly like in Java 8
+Each of those implementations supports almost all features of Javas Stream API, for example:
 
-* `filter()`
-* `map()`
-* `flatMap()`
+* `filter`: To filter elements.
+* `map`: To map values to other values.
+* `flatMap`: To map other streams into one long stream.
+* `reduce`: To combine elements from a stream into one result.
+* `distinct`: To remove duplicate elements.
+* `collect`: To collect elements into a container.
+* `toArray`: to collect elements into an array.
 
-### Changed Features
+As well as many other useful operations like `limit`, `count` etc. Anyone who already knows the Stream API from Java is going to have no problem to get started with StreamCompat, but there are a few differences and optimizations for mobile devices which means that some things are going to work a little bit differently. Notable differences are:
 
-These calls have been modified to better fit Android
-
-* `collect()`
-
-## Android-Specific Changes
-
-### Collector Interface
-
-For simplicity reasons the functionality of the `Collector` interface was changed. However this may be fixed in future versions of StreamCompat. If that happens changing the `Collector` interface would be a breaking change only for the `create()` factory method in `Collectors`.
-
-The exact difference to the Java 8 implementation is that the methods `combiner()` and  `characteristics()` have been removed. All pre defined collectors are just based on the `supplier()`, `accumulator()` and `finisher()` methods. 
-
-```java
-public interface Collector<T, A, R> {
-
-    Supplier<A> supplier();
-
-    BiConsumer<A, T> accumulator();
-
-    Function<A, R> finisher();
-}
-```
-
-Almost all `Collector` implementations are still possible with just those three methods. 
-
-### Predefined Collectors
-
-Just like in the Java 8 implementation the `Collectors` class contains many usefull pre defined `Collector` implementations.
-
-Aside from basic `toList()` and `toSet()` collectors there are also `Collector` implementations for special Android `Collections`, for example: 
-
-* `toSparseArray()`
-* `toLongSparseArray()`
-
-Additionally the default `Collection`s used in the `Collectors` class are memory efficient Android specific versions, for example `toMap()` defaults to using the `ArrayMap` implementation from the support library. 
-
+* Parallel streaming is not supported. Streams will only be evaluated serially and in the order of the source collection.
+* StreamCompat by default only uses Android specific memory efficient collections internally.
+* There are many new `Collector` implementations for Android specific collections, and lots of helper methods to help dealing with them.
+* StreamCompat includes many more primtive stream implementations to make the life of mobile developers easier and to avoid autoboxing as much as possible.
