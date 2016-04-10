@@ -295,7 +295,7 @@ public class Collectors {
         return groupingBy(classifier, toList());
     }
 
-    public static <T, A, D> Collector<T, ?, SparseArray<D>> groupingInSparseArray(ToIntFunction<? super T> classifier, Collector<? super T, A, D> downstream) {
+    public static <T, A, D> Collector<T, ?, SparseArray<D>> groupInSparseArray(ToIntFunction<? super T> classifier, Collector<? super T, A, D> downstream) {
 
         final Supplier<A> downstreamSupplier = downstream.supplier();
         final BiConsumer<A, ? super T> downstreamAccumulator = downstream.accumulator();
@@ -320,11 +320,11 @@ public class Collectors {
         );
     }
 
-    public static <T> Collector<T, ?, SparseArray<List<T>>> groupingInSparseArray(ToIntFunction<? super T> classifier) {
-        return groupingInSparseArray(classifier, toList());
+    public static <T> Collector<T, ?, SparseArray<List<T>>> groupInSparseArray(ToIntFunction<? super T> classifier) {
+        return groupInSparseArray(classifier, toList());
     }
 
-    public static <T, A, D> Collector<T, ?, LongSparseArray<D>> groupingInLongSparseArray(ToLongFunction<? super T> classifier, Collector<? super T, A, D> downstream) {
+    public static <T, A, D> Collector<T, ?, LongSparseArray<D>> groupInLongSparseArray(ToLongFunction<? super T> classifier, Collector<? super T, A, D> downstream) {
 
         final Supplier<A> downstreamSupplier = downstream.supplier();
         final BiConsumer<A, ? super T> downstreamAccumulator = downstream.accumulator();
@@ -349,8 +349,8 @@ public class Collectors {
         );
     }
 
-    public static <T> Collector<T, ?, LongSparseArray<List<T>>> groupingInLongSparseArray(ToLongFunction<? super T> classifier) {
-        return groupingInLongSparseArray(classifier, toList());
+    public static <T> Collector<T, ?, LongSparseArray<List<T>>> groupInLongSparseArray(ToLongFunction<? super T> classifier) {
+        return groupInLongSparseArray(classifier, toList());
     }
 
     public static <T, A, R> Collector<T, A, R> create(Supplier<A> supplier, BiConsumer<A, T> accumulator, Function<A, R> finisher) {
