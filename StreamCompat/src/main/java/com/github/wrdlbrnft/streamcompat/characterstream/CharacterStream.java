@@ -1,11 +1,13 @@
 package com.github.wrdlbrnft.streamcompat.characterstream;
 
+import com.github.wrdlbrnft.streamcompat.bytestream.ByteStream;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStream;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStream;
 import com.github.wrdlbrnft.streamcompat.function.CharBinaryOperator;
 import com.github.wrdlbrnft.streamcompat.function.CharConsumer;
 import com.github.wrdlbrnft.streamcompat.function.CharFunction;
 import com.github.wrdlbrnft.streamcompat.function.CharPredicate;
+import com.github.wrdlbrnft.streamcompat.function.CharToByteFunction;
 import com.github.wrdlbrnft.streamcompat.function.CharToDoubleFunction;
 import com.github.wrdlbrnft.streamcompat.function.CharToFloatFunction;
 import com.github.wrdlbrnft.streamcompat.function.CharToIntFunction;
@@ -80,6 +82,13 @@ public interface CharacterStream extends Iterable<Character> {
      * @return
      */
     FloatStream mapToFloat(CharToFloatFunction mapper);
+
+    /**
+     *
+     * @param mapper
+     * @return
+     */
+    ByteStream mapToByte(CharToByteFunction mapper);
 
     /**
      *

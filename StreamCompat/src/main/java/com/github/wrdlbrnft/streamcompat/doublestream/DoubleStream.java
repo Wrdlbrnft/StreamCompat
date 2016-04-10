@@ -1,11 +1,13 @@
 package com.github.wrdlbrnft.streamcompat.doublestream;
 
+import com.github.wrdlbrnft.streamcompat.bytestream.ByteStream;
 import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStream;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStream;
 import com.github.wrdlbrnft.streamcompat.function.DoubleBinaryOperator;
 import com.github.wrdlbrnft.streamcompat.function.DoubleConsumer;
 import com.github.wrdlbrnft.streamcompat.function.DoubleFunction;
 import com.github.wrdlbrnft.streamcompat.function.DoublePredicate;
+import com.github.wrdlbrnft.streamcompat.function.DoubleToByteFunction;
 import com.github.wrdlbrnft.streamcompat.function.DoubleToCharFunction;
 import com.github.wrdlbrnft.streamcompat.function.DoubleToFloatFunction;
 import com.github.wrdlbrnft.streamcompat.function.DoubleToIntFunction;
@@ -80,6 +82,13 @@ public interface DoubleStream extends Iterable<Double> {
      * @return
      */
     CharacterStream mapToChar(DoubleToCharFunction mapper);
+
+    /**
+     *
+     * @param mapper
+     * @return
+     */
+    ByteStream mapToByte(DoubleToByteFunction mapper);
 
     /**
      *

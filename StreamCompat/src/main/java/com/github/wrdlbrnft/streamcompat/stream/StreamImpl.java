@@ -1,5 +1,7 @@
 package com.github.wrdlbrnft.streamcompat.stream;
 
+import com.github.wrdlbrnft.streamcompat.bytestream.ByteStream;
+import com.github.wrdlbrnft.streamcompat.bytestream.ByteStreamCompat;
 import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStream;
 import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStreamCompat;
 import com.github.wrdlbrnft.streamcompat.collections.ArraySet;
@@ -14,6 +16,7 @@ import com.github.wrdlbrnft.streamcompat.function.Function;
 import com.github.wrdlbrnft.streamcompat.function.IntFunction;
 import com.github.wrdlbrnft.streamcompat.function.Predicate;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
+import com.github.wrdlbrnft.streamcompat.function.ToByteFunction;
 import com.github.wrdlbrnft.streamcompat.function.ToCharFunction;
 import com.github.wrdlbrnft.streamcompat.function.ToDoubleFunction;
 import com.github.wrdlbrnft.streamcompat.function.ToFloatFunction;
@@ -22,12 +25,14 @@ import com.github.wrdlbrnft.streamcompat.function.ToLongFunction;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStream;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStreamCompat;
 import com.github.wrdlbrnft.streamcompat.iterator.base.BaseIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.ByteChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.CharChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.ChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.DoubleChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.FloatChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.IntChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.LongChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.primtive.ByteIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.primtive.CharIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.primtive.DoubleIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.primtive.FloatIterator;
@@ -126,6 +131,16 @@ class StreamImpl<T> implements Stream<T> {
     public CharacterStream mapToChar(ToCharFunction<? super T> mapper) {
         Utils.requireNonNull(mapper);
         return CharacterStreamCompat.of(new CharChildIterator<>(
+                () -> mIterator,
+                Iterator::hasNext,
+                iterator -> mapper.apply(mIterator.next())
+        ));
+    }
+
+    @Override
+    public ByteStream mapToByte(ToByteFunction<? super T> mapper) {
+        Utils.requireNonNull(mapper);
+        return ByteStreamCompat.of(new ByteChildIterator<>(
                 () -> mIterator,
                 Iterator::hasNext,
                 iterator -> mapper.apply(mIterator.next())
@@ -243,6 +258,25 @@ class StreamImpl<T> implements Stream<T> {
                 },
                 CharIterator::hasNext,
                 CharIterator::nextChar
+        ));
+    }
+
+    @Override
+    public ByteStream flatMapToByte(Function<? super T, ? extends ByteStream> mapper) {
+        Utils.requireNonNull(mapper);
+        final ByteIterator[] buffer = new ByteIterator[1];
+        return ByteStreamCompat.of(new ByteChildIterator<>(
+                () -> {
+                    if (buffer[0] == null || !buffer[0].hasNext()) {
+                        if (!mIterator.hasNext()) {
+                            return ByteStreamCompat.empty().iterator();
+                        }
+                        buffer[0] = mapper.apply(mIterator.next()).iterator();
+                    }
+                    return buffer[0];
+                },
+                ByteIterator::hasNext,
+                ByteIterator::nextByte
         ));
     }
 

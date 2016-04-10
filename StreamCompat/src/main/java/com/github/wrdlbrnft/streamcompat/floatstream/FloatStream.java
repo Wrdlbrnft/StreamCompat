@@ -1,11 +1,13 @@
 package com.github.wrdlbrnft.streamcompat.floatstream;
 
+import com.github.wrdlbrnft.streamcompat.bytestream.ByteStream;
 import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStream;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStream;
 import com.github.wrdlbrnft.streamcompat.function.FloatBinaryOperator;
 import com.github.wrdlbrnft.streamcompat.function.FloatConsumer;
 import com.github.wrdlbrnft.streamcompat.function.FloatFunction;
 import com.github.wrdlbrnft.streamcompat.function.FloatPredicate;
+import com.github.wrdlbrnft.streamcompat.function.FloatToByteFunction;
 import com.github.wrdlbrnft.streamcompat.function.FloatToCharFunction;
 import com.github.wrdlbrnft.streamcompat.function.FloatToDoubleFunction;
 import com.github.wrdlbrnft.streamcompat.function.FloatToIntFunction;
@@ -80,6 +82,13 @@ public interface FloatStream extends Iterable<Float> {
      * @return
      */
     DoubleStream mapToDouble(FloatToDoubleFunction mapper);
+
+    /**
+     *
+     * @param mapper
+     * @return
+     */
+    ByteStream mapToByte(FloatToByteFunction mapper);
 
     /**
      *

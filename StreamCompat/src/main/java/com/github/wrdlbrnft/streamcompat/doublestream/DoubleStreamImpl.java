@@ -1,5 +1,7 @@
 package com.github.wrdlbrnft.streamcompat.doublestream;
 
+import com.github.wrdlbrnft.streamcompat.bytestream.ByteStream;
+import com.github.wrdlbrnft.streamcompat.bytestream.ByteStreamCompat;
 import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStream;
 import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStreamCompat;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStream;
@@ -8,6 +10,7 @@ import com.github.wrdlbrnft.streamcompat.function.DoubleBinaryOperator;
 import com.github.wrdlbrnft.streamcompat.function.DoubleConsumer;
 import com.github.wrdlbrnft.streamcompat.function.DoubleFunction;
 import com.github.wrdlbrnft.streamcompat.function.DoublePredicate;
+import com.github.wrdlbrnft.streamcompat.function.DoubleToByteFunction;
 import com.github.wrdlbrnft.streamcompat.function.DoubleToCharFunction;
 import com.github.wrdlbrnft.streamcompat.function.DoubleToFloatFunction;
 import com.github.wrdlbrnft.streamcompat.function.DoubleToIntFunction;
@@ -17,6 +20,7 @@ import com.github.wrdlbrnft.streamcompat.function.ObjDoubleConsumer;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStream;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStreamCompat;
+import com.github.wrdlbrnft.streamcompat.iterator.child.ByteChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.primtive.DoubleIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.base.BaseIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.CharChildIterator;
@@ -140,6 +144,16 @@ class DoubleStreamImpl implements DoubleStream {
                 () -> mIterator,
                 DoubleIterator::hasNext,
                 iterator -> mapper.applyAsChar(mIterator.nextDouble())
+        ));
+    }
+
+    @Override
+    public ByteStream mapToByte(DoubleToByteFunction mapper) {
+        Utils.requireNonNull(mapper);
+        return ByteStreamCompat.of(new ByteChildIterator<>(
+                () -> mIterator,
+                DoubleIterator::hasNext,
+                iterator -> mapper.applyAsByte(mIterator.nextDouble())
         ));
     }
 

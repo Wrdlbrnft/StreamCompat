@@ -1,5 +1,7 @@
 package com.github.wrdlbrnft.streamcompat.longstream;
 
+import com.github.wrdlbrnft.streamcompat.bytestream.ByteStream;
+import com.github.wrdlbrnft.streamcompat.bytestream.ByteStreamCompat;
 import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStream;
 import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStreamCompat;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStream;
@@ -10,6 +12,7 @@ import com.github.wrdlbrnft.streamcompat.function.LongBinaryOperator;
 import com.github.wrdlbrnft.streamcompat.function.LongConsumer;
 import com.github.wrdlbrnft.streamcompat.function.LongFunction;
 import com.github.wrdlbrnft.streamcompat.function.LongPredicate;
+import com.github.wrdlbrnft.streamcompat.function.LongToByteFunction;
 import com.github.wrdlbrnft.streamcompat.function.LongToCharFunction;
 import com.github.wrdlbrnft.streamcompat.function.LongToDoubleFunction;
 import com.github.wrdlbrnft.streamcompat.function.LongToFloatFunction;
@@ -20,6 +23,7 @@ import com.github.wrdlbrnft.streamcompat.function.Supplier;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStream;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStreamCompat;
 import com.github.wrdlbrnft.streamcompat.iterator.base.BaseIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.ByteChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.CharChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.ChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.DoubleChildIterator;
@@ -140,6 +144,16 @@ class LongStreamImpl implements LongStream {
                 () -> mIterator,
                 LongIterator::hasNext,
                 iterator -> mapper.applyAsChar(mIterator.nextLong())
+        ));
+    }
+
+    @Override
+    public ByteStream mapToByte(LongToByteFunction mapper) {
+        Utils.requireNonNull(mapper);
+        return ByteStreamCompat.of(new ByteChildIterator<>(
+                () -> mIterator,
+                LongIterator::hasNext,
+                iterator -> mapper.applyAsByte(mIterator.nextLong())
         ));
     }
 

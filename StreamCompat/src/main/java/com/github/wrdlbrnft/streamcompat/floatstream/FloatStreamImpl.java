@@ -1,5 +1,7 @@
 package com.github.wrdlbrnft.streamcompat.floatstream;
 
+import com.github.wrdlbrnft.streamcompat.bytestream.ByteStream;
+import com.github.wrdlbrnft.streamcompat.bytestream.ByteStreamCompat;
 import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStream;
 import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStreamCompat;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStream;
@@ -8,6 +10,7 @@ import com.github.wrdlbrnft.streamcompat.function.FloatBinaryOperator;
 import com.github.wrdlbrnft.streamcompat.function.FloatConsumer;
 import com.github.wrdlbrnft.streamcompat.function.FloatFunction;
 import com.github.wrdlbrnft.streamcompat.function.FloatPredicate;
+import com.github.wrdlbrnft.streamcompat.function.FloatToByteFunction;
 import com.github.wrdlbrnft.streamcompat.function.FloatToCharFunction;
 import com.github.wrdlbrnft.streamcompat.function.FloatToDoubleFunction;
 import com.github.wrdlbrnft.streamcompat.function.FloatToIntFunction;
@@ -18,12 +21,14 @@ import com.github.wrdlbrnft.streamcompat.function.Supplier;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStream;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStreamCompat;
 import com.github.wrdlbrnft.streamcompat.iterator.base.BaseIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.ByteChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.CharChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.ChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.DoubleChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.FloatChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.IntChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.LongChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.primtive.DoubleIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.primtive.FloatIterator;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStream;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStreamCompat;
@@ -140,6 +145,16 @@ class FloatStreamImpl implements FloatStream {
                 () -> mIterator,
                 FloatIterator::hasNext,
                 iterator -> mapper.applyAsDouble(mIterator.nextFloat())
+        ));
+    }
+
+    @Override
+    public ByteStream mapToByte(FloatToByteFunction mapper) {
+        Utils.requireNonNull(mapper);
+        return ByteStreamCompat.of(new ByteChildIterator<>(
+                () -> mIterator,
+                FloatIterator::hasNext,
+                iterator -> mapper.applyAsByte(mIterator.nextFloat())
         ));
     }
 

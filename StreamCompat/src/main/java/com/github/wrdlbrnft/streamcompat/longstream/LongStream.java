@@ -1,5 +1,6 @@
 package com.github.wrdlbrnft.streamcompat.longstream;
 
+import com.github.wrdlbrnft.streamcompat.bytestream.ByteStream;
 import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStream;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStream;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStream;
@@ -7,6 +8,7 @@ import com.github.wrdlbrnft.streamcompat.function.LongBinaryOperator;
 import com.github.wrdlbrnft.streamcompat.function.LongConsumer;
 import com.github.wrdlbrnft.streamcompat.function.LongFunction;
 import com.github.wrdlbrnft.streamcompat.function.LongPredicate;
+import com.github.wrdlbrnft.streamcompat.function.LongToByteFunction;
 import com.github.wrdlbrnft.streamcompat.function.LongToCharFunction;
 import com.github.wrdlbrnft.streamcompat.function.LongToDoubleFunction;
 import com.github.wrdlbrnft.streamcompat.function.LongToFloatFunction;
@@ -88,12 +90,20 @@ public interface LongStream extends Iterable<Long> {
     FloatStream mapToFloat(LongToFloatFunction mapper);
 
     /**
-     * Maps each {@code long} value tp a {@code char} values based on the supplied mapping function.
+     * Maps each {@code long} value to a {@code char} values based on the supplied mapping function.
      *
      * @param mapper A function which maps {@code long} values to {@code char} values.
      * @return Returns a new {@link CharacterStream} which contains all the mapped {@code char} values.
      */
     CharacterStream mapToChar(LongToCharFunction mapper);
+
+    /**
+     * Maps each {@code long} value to a {@code byte} values based on the supplied mapping function.
+     *
+     * @param mapper A function which maps {@code long} values to {@code byte} values.
+     * @return Returns a new {@link ByteStream} which contains all the mapped {@code byte} values.
+     */
+    ByteStream mapToByte(LongToByteFunction mapper);
 
     /**
      * Boxes each primitive {@code long} value in the {@link LongStream} by calling {@link Long#valueOf(long)}.

@@ -1,5 +1,6 @@
 package com.github.wrdlbrnft.streamcompat.intstream;
 
+import com.github.wrdlbrnft.streamcompat.bytestream.ByteStream;
 import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStream;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStream;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStream;
@@ -7,6 +8,7 @@ import com.github.wrdlbrnft.streamcompat.function.IntBinaryOperator;
 import com.github.wrdlbrnft.streamcompat.function.IntConsumer;
 import com.github.wrdlbrnft.streamcompat.function.IntFunction;
 import com.github.wrdlbrnft.streamcompat.function.IntPredicate;
+import com.github.wrdlbrnft.streamcompat.function.IntToByteFunction;
 import com.github.wrdlbrnft.streamcompat.function.IntToCharFunction;
 import com.github.wrdlbrnft.streamcompat.function.IntToDoubleFunction;
 import com.github.wrdlbrnft.streamcompat.function.IntToFloatFunction;
@@ -81,6 +83,13 @@ public interface IntStream extends Iterable<Integer> {
      * @return
      */
     CharacterStream mapToChar(IntToCharFunction mapper);
+
+    /**
+     *
+     * @param mapper
+     * @return
+     */
+    ByteStream mapToByte(IntToByteFunction mapper);
 
     /**
      *

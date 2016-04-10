@@ -1,5 +1,7 @@
 package com.github.wrdlbrnft.streamcompat.intstream;
 
+import com.github.wrdlbrnft.streamcompat.bytestream.ByteStream;
+import com.github.wrdlbrnft.streamcompat.bytestream.ByteStreamCompat;
 import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStream;
 import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStreamCompat;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStream;
@@ -10,6 +12,7 @@ import com.github.wrdlbrnft.streamcompat.function.IntBinaryOperator;
 import com.github.wrdlbrnft.streamcompat.function.IntConsumer;
 import com.github.wrdlbrnft.streamcompat.function.IntFunction;
 import com.github.wrdlbrnft.streamcompat.function.IntPredicate;
+import com.github.wrdlbrnft.streamcompat.function.IntToByteFunction;
 import com.github.wrdlbrnft.streamcompat.function.IntToCharFunction;
 import com.github.wrdlbrnft.streamcompat.function.IntToDoubleFunction;
 import com.github.wrdlbrnft.streamcompat.function.IntToFloatFunction;
@@ -17,20 +20,21 @@ import com.github.wrdlbrnft.streamcompat.function.IntToLongFunction;
 import com.github.wrdlbrnft.streamcompat.function.IntUnaryOperator;
 import com.github.wrdlbrnft.streamcompat.function.ObjIntConsumer;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
-import com.github.wrdlbrnft.streamcompat.iterator.primtive.IntIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.base.BaseIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.ByteChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.CharChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.ChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.DoubleChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.FloatChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.IntChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.LongChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.primtive.IntIterator;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStream;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStreamCompat;
-import com.github.wrdlbrnft.streamcompat.stream.Stream;
-import com.github.wrdlbrnft.streamcompat.stream.StreamCompat;
 import com.github.wrdlbrnft.streamcompat.optionals.OptionalDouble;
 import com.github.wrdlbrnft.streamcompat.optionals.OptionalInt;
+import com.github.wrdlbrnft.streamcompat.stream.Stream;
+import com.github.wrdlbrnft.streamcompat.stream.StreamCompat;
 import com.github.wrdlbrnft.streamcompat.util.Utils;
 
 /**
@@ -140,6 +144,16 @@ class IntStreamImpl implements IntStream {
                 () -> mIterator,
                 IntIterator::hasNext,
                 iterator -> mapper.applyAsChar(mIterator.nextInt())
+        ));
+    }
+
+    @Override
+    public ByteStream mapToByte(IntToByteFunction mapper) {
+        Utils.requireNonNull(mapper);
+        return ByteStreamCompat.of(new ByteChildIterator<>(
+                () -> mIterator,
+                IntIterator::hasNext,
+                iterator -> mapper.applyAsByte(mIterator.nextInt())
         ));
     }
 

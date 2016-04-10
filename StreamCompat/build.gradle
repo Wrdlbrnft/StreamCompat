@@ -30,9 +30,9 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
-String bintrayUser = hasProperty('bintray_user') ? property('bintray_user') : ''
-String bintrayApiKey = hasProperty('bintray_api_key') ? property('bintray_api_key') : ''
-String versionName = hasProperty('version_name') ? property('version_name') : ''
+final bintrayUser = hasProperty('bintray_user') ? property('bintray_user') : ''
+final bintrayApiKey = hasProperty('bintray_api_key') ? property('bintray_api_key') : ''
+final versionName = hasProperty('version_name') ? property('version_name') : ''
 
 task sourceJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs

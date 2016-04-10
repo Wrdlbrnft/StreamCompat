@@ -4,8 +4,8 @@ import android.support.v4.util.LongSparseArray;
 
 import com.github.wrdlbrnft.streamcompat.iterator.array.ArrayIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.array.LongArrayIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.primtive.LongIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.LongChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.primtive.LongIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.sparsearray.LongSparseArrayKeyIterator;
 import com.github.wrdlbrnft.streamcompat.util.EmptyIterator;
 
@@ -59,6 +59,16 @@ public class LongStreamCompat {
         }
 
         final LongIterator iterator = new LongRangeIterator(start, end);
+        return new LongStreamImpl(iterator);
+    }
+
+    public static LongStream positiveLongIntegers() {
+        final LongIterator iterator = new LongRangeIterator(0, Long.MAX_VALUE);
+        return new LongStreamImpl(iterator);
+    }
+
+    public static LongStream negativeLongIntegers() {
+        final LongIterator iterator = new LongRangeIterator(0, Long.MIN_VALUE);
         return new LongStreamImpl(iterator);
     }
 

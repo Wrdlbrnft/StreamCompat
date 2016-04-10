@@ -1,5 +1,6 @@
 package com.github.wrdlbrnft.streamcompat.stream;
 
+import com.github.wrdlbrnft.streamcompat.bytestream.ByteStream;
 import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStream;
 import com.github.wrdlbrnft.streamcompat.collections.ArraySet;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStream;
@@ -11,6 +12,7 @@ import com.github.wrdlbrnft.streamcompat.function.Function;
 import com.github.wrdlbrnft.streamcompat.function.IntFunction;
 import com.github.wrdlbrnft.streamcompat.function.Predicate;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
+import com.github.wrdlbrnft.streamcompat.function.ToByteFunction;
 import com.github.wrdlbrnft.streamcompat.function.ToCharFunction;
 import com.github.wrdlbrnft.streamcompat.function.ToDoubleFunction;
 import com.github.wrdlbrnft.streamcompat.function.ToFloatFunction;
@@ -113,6 +115,15 @@ public interface Stream<T> extends Iterable<T> {
     CharacterStream mapToChar(ToCharFunction<? super T> mapper);
 
     /**
+     * Similar to {@link Stream#mapToInt(ToIntFunction)}. This method maps every element in the {@link Stream}
+     * to a primitive {@code byte} value.
+     *
+     * @param mapper A {@link ToByteFunction} which maps the elements in the {@link Stream} to a {@code byte}.
+     * @return Returns a {@link ByteStream} which contains all the mapped {@code byte} values.
+     */
+    ByteStream mapToByte(ToByteFunction<? super T> mapper);
+
+    /**
      * Similar to {@link Stream#map(Function)}, but maps every element in the {@link Stream}
      * to a new {@link Stream} and concatenates all these {@link Stream Streams} together to create
      * a new {@link Stream} which then contains all the elements of the mapped {@link Stream Streams}.
@@ -178,6 +189,17 @@ public interface Stream<T> extends Iterable<T> {
      * {@link CharacterStream CharacterStreams}.
      */
     CharacterStream flatMapToChar(Function<? super T, ? extends CharacterStream> mapper);
+
+    /**
+     * Similar to {@link Stream#flatMapToInt(Function)} but maps every element in the {@link Stream} to
+     * a {@link ByteStream}. The returned {@link ByteStream} contains all the {@code byte} values of
+     * all the mapped {@link ByteStream ByteStreams}.
+     *
+     * @param mapper A {@link Function} which maps every element to a {@link ByteStream}.
+     * @return A new {@link ByteStream} which contains all the {@code byte} values of the mapped
+     * {@link ByteStream ByteStreams}.
+     */
+    ByteStream flatMapToByte(Function<? super T, ? extends ByteStream> mapper);
 
     /**
      * Returns a {@link Stream} which contains only distinct elements of this {@link Stream}.

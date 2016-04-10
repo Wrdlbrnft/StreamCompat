@@ -62,6 +62,16 @@ public class IntStreamCompat {
         return new IntStreamImpl(iterator);
     }
 
+    public static IntStream positiveIntegers() {
+        final IntIterator iterator = new IntRangeIterator(0, Integer.MAX_VALUE);
+        return new IntStreamImpl(iterator);
+    }
+
+    public static IntStream negativeIntegers() {
+        final IntIterator iterator = new IntRangeIterator(0, Integer.MIN_VALUE);
+        return new IntStreamImpl(iterator);
+    }
+
     public static IntStream of(IntIterator iterator) {
         return new IntStreamImpl(iterator);
     }
