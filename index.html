@@ -19,7 +19,14 @@
     </section>
 
     <section class="main-content">
-      <ul>
+      <div class="highlight highlight-source-java"><pre><span class="pl-k">final</span> <span class="pl-k">List&lt;<span class="pl-smi">ViewModel</span>&gt;</span> viewModels <span class="pl-k">=</span> <span class="pl-smi">StreamCompat</span><span class="pl-k">.</span>of(models)
+        .filter(<span class="pl-smi">ExampleModel</span><span class="pl-k">::</span>isVisible)
+        .mapToInt(<span class="pl-smi">ExampleModel</span><span class="pl-k">::</span>getTextResId)
+        .mapToObj(context<span class="pl-k">::</span>getString)
+        .map(<span class="pl-smi">ViewModel</span><span class="pl-k">::</span><span class="pl-k">new</span>)
+        .collect(<span class="pl-smi">Collectors</span><span class="pl-k">.</span>toList());</pre></div>
+
+<ul>
 <li>
 <strong>Works on every Android Device</strong>: With the new Jack Compiler you can use all the things that make Java 8s Stream API so great on API level 7 and above. Don't feel like using the preview version of the build tools? Then just use Retrolambda in the meantime!</li>
 <li>
@@ -28,12 +35,13 @@
 <strong>Optimized for Mobile Devices</strong>: This isn't just a straight backport of the Stream API! It uses an Iterator based implementation which avoids autoboxing wherever possible and defaults to memory efficient Collections to ensure that mobile developers can use it without having to worry about anything! </li>
 </ul>
 
-<div class="highlight highlight-source-java"><pre><span class="pl-k">final</span> <span class="pl-k">List&lt;<span class="pl-smi">ViewModel</span>&gt;</span> viewModels <span class="pl-k">=</span> <span class="pl-smi">StreamCompat</span><span class="pl-k">.</span>of(models)
-        .filter(<span class="pl-smi">ExampleModel</span><span class="pl-k">::</span>isVisible)
-        .mapToInt(<span class="pl-smi">ExampleModel</span><span class="pl-k">::</span>getTextResId)
-        .mapToObj(context<span class="pl-k">::</span>getString)
-        .map(<span class="pl-smi">ViewModel</span><span class="pl-k">::</span><span class="pl-k">new</span>)
-        .collect(<span class="pl-smi">Collectors</span><span class="pl-k">.</span>toList());</pre></div>
+<h1>
+<a id="table-of-content" class="anchor" href="#table-of-content" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Table of Content</h1>
+
+<ul>
+<li><a href="#how-do-i-add-it-to-my-project">How do I add it to my project?</a></li>
+<li><a href="#features">Features</a></li>
+</ul>
 
 <h1>
 <a id="how-do-i-add-it-to-my-project" class="anchor" href="#how-do-i-add-it-to-my-project" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How do I add it to my project?</h1>
@@ -99,9 +107,6 @@ apply <span class="pl-c1">plugin</span>: <span class="pl-s"><span class="pl-pds"
 
 <h1>
 <a id="features" class="anchor" href="#features" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Features</h1>
-
-<h2>
-<a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Introduction</h2>
 
 <p>StreamCompat is not meant to be a full backport of the Stream API. The most important features are included based on an <code>Iterator</code> based implementation. There is the basic <code>Stream</code> for dealing with objects, as well as special versions for primitive types. The full list is:</p>
 
