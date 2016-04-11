@@ -2,6 +2,10 @@
 
 Use Streams everywhere just like you wish you always could!
 
+* **Works on every Android Device**: With the new Jack Compiler you can use all the things that make Java 8s Stream API so great on API level 7 and above. Don't feel like using the preview version of the build tools? Then just use Retrolambda in the meantime!
+* **Efficient and Performant**: Regardless of how many filter, map or flatMap statements you use every item in source collection will be evaluated **only once**. That means high performance that scales very well!
+* **Optimized for Mobile Devices**: This isn't just a straight backport of the Stream API! It uses an Iterator based implementation which avoids autoboxing wherever possible and defaults to memory efficient Collections to ensure that mobile developers can use it without having to worry about anything! 
+
 ```java
 final List<ViewModel> viewModels = StreamCompat.of(models)
         .filter(ExampleModel::isVisible)
@@ -10,10 +14,6 @@ final List<ViewModel> viewModels = StreamCompat.of(models)
         .map(ViewModel::new)
         .collect(Collectors.toList());
 ```
-
-* **Works on every Android Device**: With the new Jack Compiler you can use all the things that make Java 8s Stream API so great on API level 7 and above. Don't feel like using the preview version of the build tools? Then just use Retrolambda in the meantime!
-* **Efficient and Performant**: Regardless of how many filter, map or flatMap statements you use every item in source collection will be evaluated **only once**. That means high performance that scales very well!
-* **Optimized for Mobile Devices**: This isn't just a straight backport of the Stream API! It uses an Iterator based implementation which avoids autoboxing wherever possible and defaults to memory efficient Collections to ensure that mobile developers can use it without having to worry about anything! 
 
 # How do I add it to my project?
 
