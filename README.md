@@ -1,10 +1,6 @@
 # StreamCompat for Android
 
-Use Streams everywhere just like you know them!
-
-* **Works on every Android Device**: With the new Jack Compiler you can use all the things that make Java 8s Stream API so great on API level 7 and above. Don't feel like using the preview version of the build tools? Then just use Retrolambda in the meantime!
-* **Efficient and Performant**: Regarless of how many filter, map or flatMap statements you use every item in source collection will be evaluated **only once**. That means high performance that scales very well!
-* **Optimized for Mobile Devices**: This isn't just a straight backport of the Stream API! It uses an Iterator based implementation which avoids autoboxing wherever possible and defaults to memory efficient Collections to ensure that mobile developers can use it without having to worry about anything! 
+Use Streams everywhere just like you wish you always could!
 
 ```java
 final List<ViewModel> viewModels = StreamCompat.of(models)
@@ -15,9 +11,11 @@ final List<ViewModel> viewModels = StreamCompat.of(models)
         .collect(Collectors.toList());
 ```
 
-# Installation
+* **Works on every Android Device**: With the new Jack Compiler you can use all the things that make Java 8s Stream API so great on API level 7 and above. Don't feel like using the preview version of the build tools? Then just use Retrolambda in the meantime!
+* **Efficient and Performant**: Regardless of how many filter, map or flatMap statements you use every item in source collection will be evaluated **only once**. That means high performance that scales very well!
+* **Optimized for Mobile Devices**: This isn't just a straight backport of the Stream API! It uses an Iterator based implementation which avoids autoboxing wherever possible and defaults to memory efficient Collections to ensure that mobile developers can use it without having to worry about anything! 
 
-## StreamCompat
+# How do I add it to my project?
 
 To use StreamCompat just add this to the dependencies closure in your build.gradle:
 
@@ -27,7 +25,7 @@ compile 'com.github.wrdlbrnft:stream-compat:0.1.0.22'
 
 To use method references and lambda expressions you either need to use the JACK compiler which is part of the preview build tools or if you don't want to do that you can just use Retrolambda instead!
 
-## Using Retrolambda
+### Using Retrolambda
 
 To use Retrolambda just paste the following at the very top of your build.gradle:
 
@@ -50,7 +48,7 @@ apply plugin: 'com.android.library' // or apply plugin: 'com.android.application
 apply plugin: 'me.tatarka.retrolambda'
 ```
 
-## Using the JACK Compiler
+### Using the JACK Compiler
 
 To activate it you need to modify three things in your build.gradle:
  1. Set your `buildToolsVersion` to `24.0.0 rc1` or higher. I recommend using the current version `24.0.0 rc2`.
@@ -79,8 +77,6 @@ android {
 ```
 
 # Features
-
-## Introduction
 
 StreamCompat is not meant to be a full backport of the Stream API. The most important features are included based on an `Iterator` based implementation. There is the basic `Stream` for dealing with objects, as well as special versions for primitive types. The full list is:
 
