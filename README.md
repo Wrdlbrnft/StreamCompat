@@ -20,7 +20,7 @@ final List<ViewModel> viewModels = StreamCompat.of(models)
 To use StreamCompat just add this to the dependencies closure in your build.gradle:
 
 ```
-compile 'com.github.wrdlbrnft:stream-compat:0.1.0.22'
+compile 'com.github.wrdlbrnft:stream-compat:0.1.0.23'
 ```
 
 To use method references and lambda expressions you either need to use the JACK compiler which is part of the preview build tools or if you don't want to do that you can just use Retrolambda instead!
@@ -98,7 +98,7 @@ Each of those implementations supports almost all features of Javas Stream API, 
 * `collect`: To collect elements into a container.
 * `toArray`: to collect elements into an array.
 
-As well as many other useful operations like `limit`, `count` etc. Anyone who already knows the Stream API from Java is going to have no problem to get started with StreamCompat, but there are a few differences and optimizations for mobile devices which means that some things are going to work a little bit differently. Notable differences are:
+As well as many other useful operations like `limit`, `skip`, `count` etc. Anyone who already knows the Stream API from Java is going to have no problem to get started with StreamCompat, but there are a few differences and optimizations for mobile devices which means that some things are going to work a little bit differently. Notable differences are:
 
 * Parallel streaming is not supported. Streams will only be evaluated serially and in the order of the source collection.
 * StreamCompat by default only uses Android specific memory efficient collections internally.
