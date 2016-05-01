@@ -121,6 +121,14 @@ public interface LongStream extends Iterable<Long> {
     LongStream limit(long maxSize);
 
     /**
+     *
+     *
+     * @param count
+     * @return
+     */
+    LongStream skip(long count);
+
+    /**
      * @param identity
      * @param op
      * @return

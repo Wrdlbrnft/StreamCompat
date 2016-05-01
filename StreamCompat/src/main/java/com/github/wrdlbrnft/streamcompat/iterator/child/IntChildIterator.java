@@ -3,8 +3,8 @@ package com.github.wrdlbrnft.streamcompat.iterator.child;
 import com.github.wrdlbrnft.streamcompat.function.Predicate;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
 import com.github.wrdlbrnft.streamcompat.function.ToIntFunction;
-import com.github.wrdlbrnft.streamcompat.iterator.primtive.IntIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.base.BaseChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.primtive.IntIterator;
 
 import java.util.Iterator;
 

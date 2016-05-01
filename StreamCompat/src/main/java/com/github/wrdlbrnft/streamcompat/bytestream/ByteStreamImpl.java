@@ -194,6 +194,22 @@ class ByteStreamImpl implements ByteStream {
     }
 
     @Override
+    public ByteStream skip(long count) {
+        final long[] buffer = {0, count};
+        return new ByteStreamImpl(new ByteChildIterator<>(
+                () -> {
+                    while (mIterator.hasNext() && buffer[0] < buffer[1]) {
+                        mIterator.nextByte();
+                        buffer[0]++;
+                    }
+                    return mIterator;
+                },
+                ByteIterator::hasNext,
+                ByteIterator::nextByte
+        ));
+    }
+
+    @Override
     public byte reduce(byte identity, ByteBinaryOperator accumulator) {
         Utils.requireNonNull(accumulator);
         byte current = identity;

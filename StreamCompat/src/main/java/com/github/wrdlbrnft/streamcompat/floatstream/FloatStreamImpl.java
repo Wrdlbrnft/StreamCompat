@@ -192,6 +192,22 @@ class FloatStreamImpl implements FloatStream {
     }
 
     @Override
+    public FloatStream skip(long count) {
+        final long[] buffer = {0, count};
+        return new FloatStreamImpl(new FloatChildIterator<>(
+                () -> {
+                    while (mIterator.hasNext() && buffer[0] < buffer[1]) {
+                        mIterator.nextFloat();
+                        buffer[0]++;
+                    }
+                    return mIterator;
+                },
+                FloatIterator::hasNext,
+                FloatIterator::nextFloat
+        ));
+    }
+
+    @Override
     public float reduce(float identity, FloatBinaryOperator accumulator) {
         Utils.requireNonNull(accumulator);
         float current = identity;

@@ -193,6 +193,22 @@ class CharacterStreamImpl implements CharacterStream {
     }
 
     @Override
+    public CharacterStream skip(long count) {
+        final long[] buffer = {0, count};
+        return new CharacterStreamImpl(new CharChildIterator<>(
+                () -> {
+                    while (mIterator.hasNext() && buffer[0] < buffer[1]) {
+                        mIterator.nextChar();
+                        buffer[0]++;
+                    }
+                    return mIterator;
+                },
+                CharIterator::hasNext,
+                CharIterator::nextChar
+        ));
+    }
+
+    @Override
     public char reduce(char identity, CharBinaryOperator accumulator) {
         Utils.requireNonNull(accumulator);
         char current = identity;

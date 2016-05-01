@@ -256,6 +256,16 @@ public interface Stream<T> extends Iterable<T> {
     Stream<T> limit(long maxSize);
 
     /**
+     * Skips the supplied number of elements at the start of the {@link Stream}. If the number of
+     * elements in the {@link Stream} is lower than the skipped count an empty {@link Stream} will
+     * be returned.
+     *
+     * @param count How many elements should be skipped
+     * @return Returns a new {@link Stream} which does not contain any of the skipped elements.
+     */
+    Stream<T> skip(long count);
+
+    /**
      * Performs a reduction operation on all the elements in the {@link Stream} with the
      * supplied {@link BinaryOperator} and them returns the reduced value as an {@link Optional}.
      * <p>

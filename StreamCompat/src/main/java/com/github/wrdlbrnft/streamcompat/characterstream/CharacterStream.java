@@ -105,6 +105,13 @@ public interface CharacterStream extends Iterable<Character> {
 
     /**
      *
+     * @param count
+     * @return
+     */
+    CharacterStream skip(long count);
+
+    /**
+     *
      * @param identity
      * @param op
      * @return

@@ -99,10 +99,17 @@ public interface IntStream extends Iterable<Integer> {
 
     /**
      *
-     * @param limit
+     * @param maxSize
      * @return
      */
-    IntStream limit(long limit);
+    IntStream limit(long maxSize);
+
+    /**
+     *
+     * @param count
+     * @return
+     */
+    IntStream skip(long count);
 
     /**
      *

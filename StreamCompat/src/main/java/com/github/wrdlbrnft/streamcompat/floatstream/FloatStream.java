@@ -105,6 +105,13 @@ public interface FloatStream extends Iterable<Float> {
 
     /**
      *
+     * @param count
+     * @return
+     */
+    FloatStream skip(long count);
+
+    /**
+     *
      * @param identity
      * @param op
      * @return

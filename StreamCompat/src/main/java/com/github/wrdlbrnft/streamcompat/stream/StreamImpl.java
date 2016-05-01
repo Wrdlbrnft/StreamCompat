@@ -339,6 +339,22 @@ class StreamImpl<T> implements Stream<T> {
     }
 
     @Override
+    public Stream<T> skip(long count) {
+        final long[] buffer = {0, count};
+        return new StreamImpl<>(new ChildIterator<>(
+                () -> {
+                    while (mIterator.hasNext() && buffer[0] < buffer[1]) {
+                        mIterator.next();
+                        buffer[0]++;
+                    }
+                    return mIterator;
+                },
+                Iterator::hasNext,
+                Iterator::next
+        ));
+    }
+
+    @Override
     public Optional<T> reduce(BinaryOperator<T> accumulator) {
         if (!mIterator.hasNext()) {
             return Optional.empty();

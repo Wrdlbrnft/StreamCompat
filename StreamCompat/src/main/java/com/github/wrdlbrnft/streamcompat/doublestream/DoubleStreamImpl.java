@@ -29,6 +29,7 @@ import com.github.wrdlbrnft.streamcompat.iterator.child.DoubleChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.FloatChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.IntChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.LongChildIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.primtive.FloatIterator;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStream;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStreamCompat;
 import com.github.wrdlbrnft.streamcompat.stream.Stream;
@@ -187,6 +188,22 @@ class DoubleStreamImpl implements DoubleStream {
                     buffer[0]++;
                     return mIterator.nextDouble();
                 }
+        ));
+    }
+
+    @Override
+    public DoubleStream skip(long count) {
+        final long[] buffer = {0, count};
+        return new DoubleStreamImpl(new DoubleChildIterator<>(
+                () -> {
+                    while (mIterator.hasNext() && buffer[0] < buffer[1]) {
+                        mIterator.nextDouble();
+                        buffer[0]++;
+                    }
+                    return mIterator;
+                },
+                DoubleIterator::hasNext,
+                DoubleIterator::nextDouble
         ));
     }
 

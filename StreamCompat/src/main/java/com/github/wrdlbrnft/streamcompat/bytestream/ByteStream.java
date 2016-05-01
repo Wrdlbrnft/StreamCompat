@@ -93,6 +93,12 @@ public interface ByteStream extends Iterable<Byte> {
     ByteStream limit(long limit);
 
     /**
+     * @param count
+     * @return
+     */
+    ByteStream skip(long count);
+
+    /**
      * @param identity
      * @param op
      * @return

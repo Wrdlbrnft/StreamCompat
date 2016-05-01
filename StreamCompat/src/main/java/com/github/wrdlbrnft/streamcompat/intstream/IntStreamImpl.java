@@ -29,6 +29,7 @@ import com.github.wrdlbrnft.streamcompat.iterator.child.FloatChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.IntChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.LongChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.primtive.IntIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.primtive.LongIterator;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStream;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStreamCompat;
 import com.github.wrdlbrnft.streamcompat.optionals.OptionalDouble;
@@ -187,6 +188,22 @@ class IntStreamImpl implements IntStream {
                     buffer[0]++;
                     return iterator.nextInt();
                 }
+        ));
+    }
+
+    @Override
+    public IntStream skip(long count) {
+        final long[] buffer = {0, count};
+        return new IntStreamImpl(new IntChildIterator<>(
+                () -> {
+                    while (mIterator.hasNext() && buffer[0] < buffer[1]) {
+                        mIterator.nextInt();
+                        buffer[0]++;
+                    }
+                    return mIterator;
+                },
+                IntIterator::hasNext,
+                IntIterator::nextInt
         ));
     }
 

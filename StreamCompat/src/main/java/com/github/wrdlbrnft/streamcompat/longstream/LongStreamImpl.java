@@ -191,6 +191,22 @@ class LongStreamImpl implements LongStream {
     }
 
     @Override
+    public LongStream skip(long count) {
+        final long[] buffer = {0, count};
+        return new LongStreamImpl(new LongChildIterator<>(
+                () -> {
+                    while (mIterator.hasNext() && buffer[0] < buffer[1]) {
+                        mIterator.nextLong();
+                        buffer[0]++;
+                    }
+                    return mIterator;
+                },
+                LongIterator::hasNext,
+                LongIterator::nextLong
+        ));
+    }
+
+    @Override
     public long reduce(long identity, LongBinaryOperator accumulator) {
         Utils.requireNonNull(accumulator);
 

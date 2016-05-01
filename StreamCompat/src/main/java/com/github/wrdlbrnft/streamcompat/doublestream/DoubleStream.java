@@ -105,6 +105,13 @@ public interface DoubleStream extends Iterable<Double> {
 
     /**
      *
+     * @param count
+     * @return
+     */
+    DoubleStream skip(long count);
+
+    /**
+     *
      * @param identity
      * @param op
      * @return
