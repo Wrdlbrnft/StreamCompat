@@ -20,7 +20,7 @@ final List<ViewModel> viewModels = StreamCompat.of(models)
 To use StreamCompat just add this to the dependencies closure in your build.gradle:
 
 ```
-compile 'com.github.wrdlbrnft:stream-compat:0.1.0.24'
+compile 'com.github.wrdlbrnft:stream-compat:0.1.0.28'
 ```
 
 To use method references and lambda expressions you either need to use the JACK compiler which is part of the preview build tools or if you don't want to do that you can just use Retrolambda instead!
@@ -51,7 +51,7 @@ apply plugin: 'me.tatarka.retrolambda'
 ### Using the JACK Compiler
 
 To activate it you need to modify three things in your build.gradle:
- 1. Set your `buildToolsVersion` to `24.0.0 rc1` or higher. I recommend using the current version `24.0.0 rc2`.
+ 1. Set your `buildToolsVersion` to `24.0.0` or higher. I recommend using the current version `24.0.1`.
  2. Enable JACK in the `jackOptions` closure.
  3. Set your language level to Java 8 in the `compileOptions` closure.
 
@@ -60,7 +60,7 @@ If you do that the build.gradle of your app module should look something like th
 ```
 android {
     ...
-    buildToolsVersion "24.0.0 rc2"
+    buildToolsVersion '24.0.1'
 
     defaultConfig {
         ...
