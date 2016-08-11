@@ -355,6 +355,16 @@ class StreamImpl<T> implements Stream<T> {
     }
 
     @Override
+    public Stream<T> sort(Comparator<T> comparator) {
+        Utils.requireNonNull(comparator);
+        return new StreamImpl<>(new ChildIterator<>(
+                () -> collect(Collectors.toOrderedList(comparator)).iterator(),
+                Iterator::hasNext,
+                Iterator::next
+        ));
+    }
+
+    @Override
     public Optional<T> reduce(BinaryOperator<T> accumulator) {
         if (!mIterator.hasNext()) {
             return Optional.empty();

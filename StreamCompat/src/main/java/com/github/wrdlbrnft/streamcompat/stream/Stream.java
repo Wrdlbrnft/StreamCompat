@@ -266,6 +266,14 @@ public interface Stream<T> extends Iterable<T> {
     Stream<T> skip(long count);
 
     /**
+     * Sorts the elements in the {@link Stream} according to the supplied {@link Comparator}.
+     *
+     * @param comparator The {@link Comparator} used to sort the elements
+     * @return Returns a new {@link Stream} which contains the elements ordered by the {@link Comparator}.
+     */
+    Stream<T> sort(Comparator<T> comparator);
+
+    /**
      * Performs a reduction operation on all the elements in the {@link Stream} with the
      * supplied {@link BinaryOperator} and them returns the reduced value as an {@link Optional}.
      * <p>

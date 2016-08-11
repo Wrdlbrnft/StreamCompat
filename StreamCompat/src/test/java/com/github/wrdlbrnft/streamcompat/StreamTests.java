@@ -10,6 +10,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.security.SecureRandom;
+import java.util.Comparator;
 import java.util.Random;
 
 /**
@@ -44,6 +45,16 @@ public class StreamTests {
                 .toArray(String[]::new);
 
         final String[] expected = new String[]{"Apple", "Google", "Google"};
+        Assert.assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void testSort() {
+        final String[] actual = StreamCompat.of("Apple", "Android", "Google", "Android", "Google")
+                .sort(String::compareTo)
+                .toArray(String[]::new);
+
+        final String[] expected = new String[]{"Android", "Android", "Apple", "Google", "Google"};
         Assert.assertArrayEquals(expected, actual);
     }
 
