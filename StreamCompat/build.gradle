@@ -45,8 +45,8 @@ publishing {
             groupId 'com.github.wrdlbrnft'
             artifactId 'stream-compat'
             version versionName
-            artifact(sourceJar)
-            artifact('$buildDir/outputs/aar/StreamCompat-release.aar')
+            artifact sourceJar
+            artifact new File(buildDir, '/outputs/aar/StreamCompat-release.aar')
         }
     }
 }
