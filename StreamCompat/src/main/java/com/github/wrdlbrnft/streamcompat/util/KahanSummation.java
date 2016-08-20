@@ -36,7 +36,7 @@ public class KahanSummation {
     public static float computeFinalSum(float[] summands) {
         float tmp = summands[0] + summands[1];
         float simpleSum = summands[summands.length - 1];
-        if (Double.isNaN(tmp) && Double.isInfinite(simpleSum)) {
+        if (Float.isNaN(tmp) && Float.isInfinite(simpleSum)) {
             return simpleSum;
         } else {
             return tmp;
