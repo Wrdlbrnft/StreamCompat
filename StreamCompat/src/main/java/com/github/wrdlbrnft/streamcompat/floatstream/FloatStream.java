@@ -162,6 +162,12 @@ public interface FloatStream extends Iterable<Float> {
      *
      * @return
      */
+    FloatStream sort();
+
+    /**
+     *
+     * @return
+     */
     OptionalFloat average();
 
     /**

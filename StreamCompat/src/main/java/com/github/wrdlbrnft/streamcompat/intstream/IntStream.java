@@ -163,6 +163,12 @@ public interface IntStream extends Iterable<Integer> {
      *
      * @return
      */
+    IntStream sort();
+
+    /**
+     *
+     * @return
+     */
     OptionalDouble average();
 
     /**

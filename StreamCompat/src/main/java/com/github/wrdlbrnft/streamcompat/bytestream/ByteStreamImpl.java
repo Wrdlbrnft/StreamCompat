@@ -20,6 +20,7 @@ import com.github.wrdlbrnft.streamcompat.function.ObjByteConsumer;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStream;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStreamCompat;
+import com.github.wrdlbrnft.streamcompat.iterator.array.ByteArrayIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.base.BaseIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.ByteChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.CharChildIterator;
@@ -29,7 +30,6 @@ import com.github.wrdlbrnft.streamcompat.iterator.child.FloatChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.IntChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.LongChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.primtive.ByteIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.primtive.ByteIterator;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStream;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStreamCompat;
 import com.github.wrdlbrnft.streamcompat.optionals.OptionalByte;
@@ -37,6 +37,8 @@ import com.github.wrdlbrnft.streamcompat.optionals.OptionalDouble;
 import com.github.wrdlbrnft.streamcompat.stream.Stream;
 import com.github.wrdlbrnft.streamcompat.stream.StreamCompat;
 import com.github.wrdlbrnft.streamcompat.util.Utils;
+
+import java.util.Arrays;
 
 /**
  * Created by kapeller on 21/03/16.
@@ -262,6 +264,19 @@ class ByteStreamImpl implements ByteStream {
     @Override
     public long count() {
         return mapToLong(i -> 1L).sum();
+    }
+
+    @Override
+    public ByteStream sort() {
+        return new ByteStreamImpl(new ByteChildIterator<>(
+                () -> {
+                    final byte[] array = toArray();
+                    Arrays.sort(array);
+                    return new ByteArrayIterator(array);
+                },
+                ByteIterator::hasNext,
+                ByteIterator::nextByte
+        ));
     }
 
     public OptionalDouble average() {

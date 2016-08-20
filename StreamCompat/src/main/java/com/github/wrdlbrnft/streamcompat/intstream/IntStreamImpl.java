@@ -20,6 +20,7 @@ import com.github.wrdlbrnft.streamcompat.function.IntToLongFunction;
 import com.github.wrdlbrnft.streamcompat.function.IntUnaryOperator;
 import com.github.wrdlbrnft.streamcompat.function.ObjIntConsumer;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
+import com.github.wrdlbrnft.streamcompat.iterator.array.IntArrayIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.base.BaseIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.ByteChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.CharChildIterator;
@@ -29,7 +30,6 @@ import com.github.wrdlbrnft.streamcompat.iterator.child.FloatChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.IntChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.LongChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.primtive.IntIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.primtive.LongIterator;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStream;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStreamCompat;
 import com.github.wrdlbrnft.streamcompat.optionals.OptionalDouble;
@@ -37,6 +37,8 @@ import com.github.wrdlbrnft.streamcompat.optionals.OptionalInt;
 import com.github.wrdlbrnft.streamcompat.stream.Stream;
 import com.github.wrdlbrnft.streamcompat.stream.StreamCompat;
 import com.github.wrdlbrnft.streamcompat.util.Utils;
+
+import java.util.Arrays;
 
 /**
  * Created by kapeller on 21/03/16.
@@ -261,6 +263,19 @@ class IntStreamImpl implements IntStream {
     @Override
     public long count() {
         return mapToLong(i -> 1L).sum();
+    }
+
+    @Override
+    public IntStream sort() {
+        return new IntStreamImpl(new IntChildIterator<>(
+                () -> {
+                    final int[] array = toArray();
+                    Arrays.sort(array);
+                    return new IntArrayIterator(array);
+                },
+                IntIterator::hasNext,
+                IntIterator::nextInt
+        ));
     }
 
     @Override

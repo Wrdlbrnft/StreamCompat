@@ -20,6 +20,7 @@ import com.github.wrdlbrnft.streamcompat.function.ObjCharConsumer;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStream;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStreamCompat;
+import com.github.wrdlbrnft.streamcompat.iterator.array.CharArrayIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.base.BaseIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.ByteChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.CharChildIterator;
@@ -31,11 +32,13 @@ import com.github.wrdlbrnft.streamcompat.iterator.child.LongChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.primtive.CharIterator;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStream;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStreamCompat;
-import com.github.wrdlbrnft.streamcompat.stream.Stream;
-import com.github.wrdlbrnft.streamcompat.stream.StreamCompat;
 import com.github.wrdlbrnft.streamcompat.optionals.OptionalCharacter;
 import com.github.wrdlbrnft.streamcompat.optionals.OptionalDouble;
+import com.github.wrdlbrnft.streamcompat.stream.Stream;
+import com.github.wrdlbrnft.streamcompat.stream.StreamCompat;
 import com.github.wrdlbrnft.streamcompat.util.Utils;
+
+import java.util.Arrays;
 
 /**
  * Created by kapeller on 21/03/16.
@@ -261,6 +264,19 @@ class CharacterStreamImpl implements CharacterStream {
     @Override
     public long count() {
         return mapToLong(i -> 1L).sum();
+    }
+
+    @Override
+    public CharacterStream sort() {
+        return new CharacterStreamImpl(new CharChildIterator<>(
+                () -> {
+                    final char[] array = toArray();
+                    Arrays.sort(array);
+                    return new CharArrayIterator(array);
+                },
+                CharIterator::hasNext,
+                CharIterator::nextChar
+        ));
     }
 
     public OptionalDouble average() {

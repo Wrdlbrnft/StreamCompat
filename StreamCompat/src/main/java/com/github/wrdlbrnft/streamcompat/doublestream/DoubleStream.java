@@ -162,6 +162,12 @@ public interface DoubleStream extends Iterable<Double> {
      *
      * @return
      */
+    DoubleStream sort();
+
+    /**
+     *
+     * @return
+     */
     OptionalDouble average();
 
     /**

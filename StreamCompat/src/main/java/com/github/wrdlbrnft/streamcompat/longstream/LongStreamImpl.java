@@ -22,6 +22,7 @@ import com.github.wrdlbrnft.streamcompat.function.ObjLongConsumer;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStream;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStreamCompat;
+import com.github.wrdlbrnft.streamcompat.iterator.array.LongArrayIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.base.BaseIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.ByteChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.CharChildIterator;
@@ -31,11 +32,13 @@ import com.github.wrdlbrnft.streamcompat.iterator.child.FloatChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.IntChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.LongChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.primtive.LongIterator;
-import com.github.wrdlbrnft.streamcompat.stream.Stream;
-import com.github.wrdlbrnft.streamcompat.stream.StreamCompat;
 import com.github.wrdlbrnft.streamcompat.optionals.OptionalDouble;
 import com.github.wrdlbrnft.streamcompat.optionals.OptionalLong;
+import com.github.wrdlbrnft.streamcompat.stream.Stream;
+import com.github.wrdlbrnft.streamcompat.stream.StreamCompat;
 import com.github.wrdlbrnft.streamcompat.util.Utils;
+
+import java.util.Arrays;
 
 /**
  * Created by kapeller on 21/03/16.
@@ -262,6 +265,19 @@ class LongStreamImpl implements LongStream {
     @Override
     public long count() {
         return map(i -> 1L).sum();
+    }
+
+    @Override
+    public LongStream sort() {
+        return new LongStreamImpl(new LongChildIterator<>(
+                () -> {
+                    final long[] array = toArray();
+                    Arrays.sort(array);
+                    return new LongArrayIterator(array);
+                },
+                LongIterator::hasNext,
+                LongIterator::nextLong
+        ));
     }
 
     @Override

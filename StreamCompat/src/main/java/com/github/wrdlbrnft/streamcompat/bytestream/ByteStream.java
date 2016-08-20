@@ -135,6 +135,12 @@ public interface ByteStream extends Iterable<Byte> {
     long count();
 
     /**
+     *
+     * @return
+     */
+    ByteStream sort();
+
+    /**
      * @return
      */
     OptionalByte findFirst();

@@ -156,6 +156,12 @@ public interface CharacterStream extends Iterable<Character> {
      *
      * @return
      */
+    CharacterStream sort();
+
+    /**
+     *
+     * @return
+     */
     OptionalCharacter findFirst();
 
     /**

@@ -170,6 +170,12 @@ public interface LongStream extends Iterable<Long> {
     long count();
 
     /**
+     *
+     * @return
+     */
+    LongStream sort();
+
+    /**
      * @return
      */
     OptionalDouble average();

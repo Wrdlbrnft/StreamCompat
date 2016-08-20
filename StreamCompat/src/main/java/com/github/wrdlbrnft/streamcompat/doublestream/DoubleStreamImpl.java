@@ -20,23 +20,25 @@ import com.github.wrdlbrnft.streamcompat.function.ObjDoubleConsumer;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStream;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStreamCompat;
-import com.github.wrdlbrnft.streamcompat.iterator.child.ByteChildIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.primtive.DoubleIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.array.DoubleArrayIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.base.BaseIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.child.ByteChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.CharChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.ChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.DoubleChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.FloatChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.IntChildIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.LongChildIterator;
-import com.github.wrdlbrnft.streamcompat.iterator.primtive.FloatIterator;
+import com.github.wrdlbrnft.streamcompat.iterator.primtive.DoubleIterator;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStream;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStreamCompat;
+import com.github.wrdlbrnft.streamcompat.optionals.OptionalDouble;
 import com.github.wrdlbrnft.streamcompat.stream.Stream;
 import com.github.wrdlbrnft.streamcompat.stream.StreamCompat;
 import com.github.wrdlbrnft.streamcompat.util.KahanSummation;
-import com.github.wrdlbrnft.streamcompat.optionals.OptionalDouble;
 import com.github.wrdlbrnft.streamcompat.util.Utils;
+
+import java.util.Arrays;
 
 /**
  * Created by kapeller on 21/03/16.
@@ -268,6 +270,19 @@ class DoubleStreamImpl implements DoubleStream {
     @Override
     public long count() {
         return mapToLong(i -> 1L).sum();
+    }
+
+    @Override
+    public DoubleStream sort() {
+        return new DoubleStreamImpl(new DoubleChildIterator<>(
+                () -> {
+                    final double[] array = toArray();
+                    Arrays.sort(array);
+                    return new DoubleArrayIterator(array);
+                },
+                DoubleIterator::hasNext,
+                DoubleIterator::nextDouble
+        ));
     }
 
     @Override

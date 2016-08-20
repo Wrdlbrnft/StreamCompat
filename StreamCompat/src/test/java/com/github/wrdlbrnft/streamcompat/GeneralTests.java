@@ -16,7 +16,7 @@ import java.util.Random;
 /**
  * Created by kapeller on 21/03/16.
  */
-public class StreamTests {
+public class GeneralTests {
 
     @Test
     public void testCharacterStreamToArray() {
@@ -45,16 +45,6 @@ public class StreamTests {
                 .toArray(String[]::new);
 
         final String[] expected = new String[]{"Apple", "Google", "Google"};
-        Assert.assertArrayEquals(expected, actual);
-    }
-
-    @Test
-    public void testSort() {
-        final String[] actual = StreamCompat.of("Apple", "Android", "Google", "Android", "Google")
-                .sort(String::compareTo)
-                .toArray(String[]::new);
-
-        final String[] expected = new String[]{"Android", "Android", "Apple", "Google", "Google"};
         Assert.assertArrayEquals(expected, actual);
     }
 
