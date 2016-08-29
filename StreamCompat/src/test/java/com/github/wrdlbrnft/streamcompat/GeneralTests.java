@@ -2,16 +2,11 @@ package com.github.wrdlbrnft.streamcompat;
 
 import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStreamCompat;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStreamCompat;
-import com.github.wrdlbrnft.streamcompat.longstream.LongStream;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStreamCompat;
 import com.github.wrdlbrnft.streamcompat.stream.StreamCompat;
 
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.security.SecureRandom;
-import java.util.Comparator;
-import java.util.Random;
 
 /**
  * Created by kapeller on 21/03/16.
