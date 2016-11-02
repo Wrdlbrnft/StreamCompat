@@ -53,7 +53,7 @@ apply plugin: 'me.tatarka.retrolambda'
 ### Using the JACK Compiler
 
 To activate it you need to modify three things in your build.gradle:
- 1. Set your `buildToolsVersion` to `24.0.0` or higher. I recommend using the current version `24.0.1`.
+ 1. Set your `buildToolsVersion` to `24.0.0` or higher.
  2. Enable JACK in the `jackOptions` closure.
  3. Set your language level to Java 8 in the `compileOptions` closure.
 
@@ -62,7 +62,7 @@ If you do that the build.gradle of your app module should look something like th
 ```
 android {
     ...
-    buildToolsVersion '24.0.1'
+    buildToolsVersion '25.0.0'
 
     defaultConfig {
         ...
