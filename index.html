@@ -40,7 +40,7 @@
 
 <p>To use StreamCompat just add this to the dependencies closure in your build.gradle:</p>
 
-<pre><code>compile 'com.github.wrdlbrnft:stream-compat:0.2.0.2'
+<pre><code>compile 'com.github.wrdlbrnft:stream-compat:0.2.0.4'
 </code></pre>
 
 <p>To use method references and lambda expressions you either need to use the JACK compiler which is part of the preview build tools or if you don't want to do that you can just use Retrolambda instead!</p>
@@ -72,7 +72,7 @@ apply <span class="pl-c1">plugin</span>: <span class="pl-s"><span class="pl-pds"
 <p>To activate it you need to modify three things in your build.gradle:</p>
 
 <ol>
-<li>Set your <code>buildToolsVersion</code> to <code>24.0.0</code> or higher. I recommend using the current version <code>24.0.1</code>.</li>
+<li>Set your <code>buildToolsVersion</code> to <code>24.0.0</code> or higher.</li>
 <li>Enable JACK in the <code>jackOptions</code> closure.</li>
 <li>Set your language level to Java 8 in the <code>compileOptions</code> closure.</li>
 </ol>
@@ -81,7 +81,7 @@ apply <span class="pl-c1">plugin</span>: <span class="pl-s"><span class="pl-pds"
 
 <pre><code>android {
     ...
-    buildToolsVersion '24.0.1'
+    buildToolsVersion '25.0.0'
 
     defaultConfig {
         ...
