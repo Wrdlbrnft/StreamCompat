@@ -53,24 +53,26 @@ import java.util.Set;
 class StreamImpl<T> implements Stream<T> {
 
     private final Iterator<T> mIterator;
+    private final IteratorWrapper<T> mIteratorWrapper = new BaseIteratorWrapperImpl<T>();
 
-    public StreamImpl(Iterator<T> iterator) {
-        mIterator = iterator;
+    StreamImpl(Iterator<T> iterator) {
+        mIterator = mIteratorWrapper.apply(iterator);
     }
 
     @Override
     public Stream<T> filter(Predicate<T> predicate) {
         Utils.requireNonNull(predicate);
-        final DummyIterator<T> iterator = new DummyIterator<>();
+
+        final DummyIterator<T> dummy = new DummyIterator<>();
         return new StreamImpl<>(new ChildIterator<>(
                 () -> {
                     while (mIterator.hasNext()) {
                         final T value = mIterator.next();
                         if (predicate.test(value)) {
-                            return iterator.newValue(value);
+                            return dummy.newValue(value);
                         }
                     }
-                    return iterator;
+                    return dummy;
                 },
                 Iterator::hasNext,
                 Iterator::next
@@ -83,7 +85,7 @@ class StreamImpl<T> implements Stream<T> {
         return new StreamImpl<>(new ChildIterator<>(
                 () -> mIterator,
                 Iterator::hasNext,
-                iterator -> mapper.apply(mIterator.next())
+                i -> mapper.apply(mIterator.next())
         ));
     }
 
@@ -93,7 +95,7 @@ class StreamImpl<T> implements Stream<T> {
         return IntStreamCompat.of(new IntChildIterator<>(
                 () -> mIterator,
                 Iterator::hasNext,
-                iterator -> mapper.apply(mIterator.next())
+                i -> mapper.apply(i.next())
         ));
     }
 
@@ -103,7 +105,7 @@ class StreamImpl<T> implements Stream<T> {
         return LongStreamCompat.of(new LongChildIterator<>(
                 () -> mIterator,
                 Iterator::hasNext,
-                iterator -> mapper.apply(mIterator.next())
+                i -> mapper.apply(i.next())
         ));
     }
 
@@ -113,7 +115,7 @@ class StreamImpl<T> implements Stream<T> {
         return DoubleStreamCompat.of(new DoubleChildIterator<>(
                 () -> mIterator,
                 Iterator::hasNext,
-                iterator -> mapper.apply(mIterator.next())
+                i -> mapper.apply(i.next())
         ));
     }
 
@@ -123,7 +125,7 @@ class StreamImpl<T> implements Stream<T> {
         return FloatStreamCompat.of(new FloatChildIterator<>(
                 () -> mIterator,
                 Iterator::hasNext,
-                iterator -> mapper.apply(mIterator.next())
+                i -> mapper.apply(i.next())
         ));
     }
 
@@ -133,7 +135,7 @@ class StreamImpl<T> implements Stream<T> {
         return CharacterStreamCompat.of(new CharChildIterator<>(
                 () -> mIterator,
                 Iterator::hasNext,
-                iterator -> mapper.apply(mIterator.next())
+                i -> mapper.apply(i.next())
         ));
     }
 
@@ -143,7 +145,7 @@ class StreamImpl<T> implements Stream<T> {
         return ByteStreamCompat.of(new ByteChildIterator<>(
                 () -> mIterator,
                 Iterator::hasNext,
-                iterator -> mapper.apply(mIterator.next())
+                i -> mapper.apply(i.next())
         ));
     }
 
@@ -282,17 +284,18 @@ class StreamImpl<T> implements Stream<T> {
 
     @Override
     public Stream<T> distinct(Supplier<Set<T>> setSupplier) {
+        Utils.requireNonNull(setSupplier);
         final Set<T> set = setSupplier.get();
-        final DummyIterator<T> iterator = new DummyIterator<>();
+        final DummyIterator<T> dummy = new DummyIterator<>();
         return new StreamImpl<>(new ChildIterator<>(
                 () -> {
                     while (mIterator.hasNext()) {
                         final T value = mIterator.next();
                         if (set.add(value)) {
-                            return iterator.newValue(value);
+                            return dummy.newValue(value);
                         }
                     }
-                    return iterator;
+                    return dummy;
                 },
                 Iterator::hasNext,
                 Iterator::next
@@ -318,7 +321,10 @@ class StreamImpl<T> implements Stream<T> {
 
     @Override
     public <R> R collect(Supplier<R> supplier, BiConsumer<R, ? super T> accumulator) {
-        final R result = Utils.requireNonNull(supplier).get();
+        Utils.requireNonNull(accumulator);
+        Utils.requireNonNull(supplier);
+
+        final R result = supplier.get();
         while (mIterator.hasNext()) {
             accumulator.accept(result, mIterator.next());
         }
@@ -330,12 +336,18 @@ class StreamImpl<T> implements Stream<T> {
         final long[] buffer = {0, maxSize};
         return new StreamImpl<>(new ChildIterator<>(
                 () -> mIterator,
-                iterator -> buffer[0] < buffer[1] && mIterator.hasNext(),
-                iterator -> {
+                i -> buffer[0] < buffer[1] && i.hasNext(),
+                i -> {
                     buffer[0]++;
-                    return mIterator.next();
+                    return i.next();
                 }
         ));
+    }
+
+    @Override
+    public <E extends Throwable> Exceptional<T, E> exception(Class<E> cls) {
+        Utils.requireNonNull(cls);
+        return new ExceptionalImpl<>(cls);
     }
 
     @Override
@@ -514,6 +526,42 @@ class StreamImpl<T> implements Stream<T> {
         public T next() {
             mHasNext = false;
             return mValue;
+        }
+    }
+
+    private class ExceptionalImpl<E extends Throwable> implements Exceptional<T, E> {
+
+        private final Class<E> mExceptionClass;
+
+        ExceptionalImpl(Class<E> cls) {
+            mExceptionClass = cls;
+        }
+
+        @Override
+        public Stream<T> consume(Consumer<E> consumer) {
+            mIteratorWrapper.consumeException(mExceptionClass, consumer);
+            return StreamImpl.this;
+        }
+
+        @Override
+        public <I extends RuntimeException> Stream<T> rethrow(Function<E, I> mapper) {
+            mIteratorWrapper.consumeException(mExceptionClass, e -> {
+                throw mapper.apply(e);
+            });
+            return StreamImpl.this;
+        }
+
+        @Override
+        public Stream<T> ignore() {
+            mIteratorWrapper.consumeException(mExceptionClass, e -> {
+            });
+            return StreamImpl.this;
+        }
+
+        @Override
+        public Stream<T> mapException(Function<E, T> mapper) {
+            mIteratorWrapper.mapException(mExceptionClass, mapper);
+            return StreamImpl.this;
         }
     }
 }

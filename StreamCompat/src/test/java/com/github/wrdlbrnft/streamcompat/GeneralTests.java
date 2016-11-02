@@ -1,5 +1,7 @@
 package com.github.wrdlbrnft.streamcompat;
 
+import android.util.Log;
+
 import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStreamCompat;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStreamCompat;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStreamCompat;
@@ -8,10 +10,14 @@ import com.github.wrdlbrnft.streamcompat.stream.StreamCompat;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.text.ParseException;
+
 /**
  * Created by kapeller on 21/03/16.
  */
 public class GeneralTests {
+
+    private static final String TAG = "GeneralTests";
 
     @Test
     public void testCharacterStreamToArray() {

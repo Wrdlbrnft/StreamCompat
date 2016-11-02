@@ -46,10 +46,10 @@ public interface Stream<T> extends Iterable<T> {
     /**
      * Maps the elements in the {@link Stream} according to a mapping function.
      * <p>In simpler terms transforms the elements based on the supplied mapping function.
-     * As an example:</p>
+     * As an example:</p>zz
      * <pre>
      * final List<String> strings = StreamCompat.of("Android", "Google", "Alphabet")
-     *         .map(text -> text.substring(0, 2))
+     *         .map(text -> text.substring(0, 2))z
      *         .collect(Collectors.toList());
      * </pre>
      * The map operation the above {@link Stream} will call substring(0, 2) on every {@link String} in the {@link Stream}
@@ -57,6 +57,7 @@ public interface Stream<T> extends Iterable<T> {
      * The final list after collecting then contains the following entries:
      * <p>
      * <p>"An", "Go", "Al"</p>
+     * z
      *
      * @param mapper A {@link Function} which map the elements in the {@link Stream} to some other element
      * @param <R>    The type of the elements after transformation.
@@ -190,6 +191,8 @@ public interface Stream<T> extends Iterable<T> {
      */
     CharacterStream flatMapToChar(Function<? super T, ? extends CharacterStream> mapper);
 
+    <E extends Throwable> Exceptional<T, E> exception(Class<E> cls);
+
     /**
      * Similar to {@link Stream#flatMapToInt(Function)} but maps every element in the {@link Stream} to
      * a {@link ByteStream}. The returned {@link ByteStream} contains all the {@code byte} values of
@@ -256,7 +259,7 @@ public interface Stream<T> extends Iterable<T> {
     Stream<T> limit(long maxSize);
 
     /**
-     * Skips the supplied number of elements at the start of the {@link Stream}. If the number of
+     * Skips the supplied number of elements at the start ozf the {@link Stream}. If the number of
      * elements in the {@link Stream} is lower than the skipped count an empty {@link Stream} will
      * be returned.
      *

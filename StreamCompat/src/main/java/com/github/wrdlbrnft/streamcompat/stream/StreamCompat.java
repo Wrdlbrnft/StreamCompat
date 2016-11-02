@@ -37,7 +37,7 @@ public class StreamCompat {
                         }
                         do {
                             buffer[0] = iterator.next().iterator();
-                        } while(iterator.hasNext() && !buffer[0].hasNext());
+                        } while (iterator.hasNext() && !buffer[0].hasNext());
                     }
                     return buffer[0];
                 },
