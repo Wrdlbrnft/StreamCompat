@@ -149,6 +149,8 @@ public interface LongStream extends Iterable<Long> {
      */
     <R> R collect(Supplier<R> supplier, ObjLongConsumer<R> accumulator);
 
+    <E extends Throwable> LongExceptional<E> exception(Class<E> cls);
+
     /**
      * @return
      */

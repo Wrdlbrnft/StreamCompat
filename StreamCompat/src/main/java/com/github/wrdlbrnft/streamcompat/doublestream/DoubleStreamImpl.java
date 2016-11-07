@@ -6,6 +6,7 @@ import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStream;
 import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStreamCompat;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStream;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStreamCompat;
+import com.github.wrdlbrnft.streamcompat.function.Consumer;
 import com.github.wrdlbrnft.streamcompat.function.DoubleBinaryOperator;
 import com.github.wrdlbrnft.streamcompat.function.DoubleConsumer;
 import com.github.wrdlbrnft.streamcompat.function.DoubleFunction;
@@ -16,8 +17,10 @@ import com.github.wrdlbrnft.streamcompat.function.DoubleToFloatFunction;
 import com.github.wrdlbrnft.streamcompat.function.DoubleToIntFunction;
 import com.github.wrdlbrnft.streamcompat.function.DoubleToLongFunction;
 import com.github.wrdlbrnft.streamcompat.function.DoubleUnaryOperator;
+import com.github.wrdlbrnft.streamcompat.function.Function;
 import com.github.wrdlbrnft.streamcompat.function.ObjDoubleConsumer;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
+import com.github.wrdlbrnft.streamcompat.function.ToDoubleFunction;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStream;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStreamCompat;
 import com.github.wrdlbrnft.streamcompat.iterator.array.DoubleArrayIterator;
@@ -46,10 +49,11 @@ import java.util.Arrays;
 class DoubleStreamImpl implements DoubleStream {
 
     private static final int DEFAULT_ARRAY_SIZE = 16;
+    private final DoubleIteratorWrapper mIteratorWrapper = new DoubleIteratorWrapperImpl();
     private final DoubleIterator mIterator;
 
     DoubleStreamImpl(DoubleIterator iterator) {
-        mIterator = iterator;
+        mIterator = mIteratorWrapper.apply(iterator);
     }
 
     @Override
@@ -246,6 +250,11 @@ class DoubleStreamImpl implements DoubleStream {
     }
 
     @Override
+    public <E extends Throwable> DoubleExceptional<E> exception(Class<E> cls) {
+        return new DoubleExceptionalImpl<>(cls);
+    }
+
+    @Override
     public double sum() {
         double[] summation = collect(() -> new double[3],
                 (ll, d) -> {
@@ -395,6 +404,42 @@ class DoubleStreamImpl implements DoubleStream {
         @Override
         public Double next() {
             return nextDouble();
+        }
+    }
+
+    private class DoubleExceptionalImpl<E extends Throwable> implements DoubleExceptional<E> {
+
+        private final Class<E> mExceptionClass;
+
+        public DoubleExceptionalImpl(Class<E> exceptionClass) {
+            mExceptionClass = exceptionClass;
+        }
+
+        @Override
+        public DoubleStream mapException(ToDoubleFunction<E> mapper) {
+            mIteratorWrapper.mapException(mExceptionClass, mapper);
+            return DoubleStreamImpl.this;
+        }
+
+        @Override
+        public DoubleStream consume(Consumer<E> consumer) {
+            mIteratorWrapper.consumeException(mExceptionClass, consumer);
+            return DoubleStreamImpl.this;
+        }
+
+        @Override
+        public <I extends RuntimeException> DoubleStream rethrow(Function<E, I> mapper) {
+            mIteratorWrapper.consumeException(mExceptionClass, e -> {
+                throw mapper.apply(e);
+            });
+            return DoubleStreamImpl.this;
+        }
+
+        @Override
+        public DoubleStream ignore() {
+            mIteratorWrapper.consumeException(mExceptionClass, e -> {
+            });
+            return DoubleStreamImpl.this;
         }
     }
 }

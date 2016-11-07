@@ -119,6 +119,8 @@ public interface ByteStream extends Iterable<Byte> {
      */
     <R> R collect(Supplier<R> supplier, ObjByteConsumer<R> accumulator);
 
+    <E extends Throwable> ByteExceptional<E> exception(Class<E> cls);
+
     /**
      * @return
      */
@@ -135,7 +137,6 @@ public interface ByteStream extends Iterable<Byte> {
     long count();
 
     /**
-     *
      * @return
      */
     ByteStream sort();

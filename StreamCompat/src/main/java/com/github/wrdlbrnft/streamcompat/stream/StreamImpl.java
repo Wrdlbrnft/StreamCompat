@@ -53,7 +53,7 @@ import java.util.Set;
 class StreamImpl<T> implements Stream<T> {
 
     private final Iterator<T> mIterator;
-    private final IteratorWrapper<T> mIteratorWrapper = new BaseIteratorWrapperImpl<T>();
+    private final IteratorWrapper<T> mIteratorWrapper = new IteratorWrapperImpl<>();
 
     StreamImpl(Iterator<T> iterator) {
         mIterator = mIteratorWrapper.apply(iterator);

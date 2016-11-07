@@ -16,8 +16,11 @@ import com.github.wrdlbrnft.streamcompat.function.CharToFloatFunction;
 import com.github.wrdlbrnft.streamcompat.function.CharToIntFunction;
 import com.github.wrdlbrnft.streamcompat.function.CharToLongFunction;
 import com.github.wrdlbrnft.streamcompat.function.CharUnaryOperator;
+import com.github.wrdlbrnft.streamcompat.function.Consumer;
+import com.github.wrdlbrnft.streamcompat.function.Function;
 import com.github.wrdlbrnft.streamcompat.function.ObjCharConsumer;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
+import com.github.wrdlbrnft.streamcompat.function.ToCharFunction;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStream;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStreamCompat;
 import com.github.wrdlbrnft.streamcompat.iterator.array.CharArrayIterator;
@@ -47,10 +50,11 @@ class CharacterStreamImpl implements CharacterStream {
 
     private static final int DEFAULT_ARRAY_SIZE = 16;
 
+    private final CharacterIteratorWrapper mIteratorWrapper = new CharacterIteratorWrapperImpl();
     private final CharIterator mIterator;
 
     CharacterStreamImpl(CharIterator iterator) {
-        mIterator = iterator;
+        mIterator = mIteratorWrapper.apply(iterator);
     }
 
     @Override
@@ -247,6 +251,11 @@ class CharacterStreamImpl implements CharacterStream {
         return sink;
     }
 
+    @Override
+    public <E extends Throwable> CharacterExceptional<E> exception(Class<E> cls) {
+        return new CharacterExceptionalImpl<>(cls);
+    }
+
     public char sum() {
         return reduce((char) 0, (a, b) -> (char) (a + b));
     }
@@ -387,6 +396,42 @@ class CharacterStreamImpl implements CharacterStream {
         @Override
         public Character next() {
             return nextChar();
+        }
+    }
+
+    private class CharacterExceptionalImpl<E extends Throwable> implements CharacterExceptional<E> {
+
+        private final Class<E> mExceptionClass;
+
+        public CharacterExceptionalImpl(Class<E> exceptionClass) {
+            mExceptionClass = exceptionClass;
+        }
+
+        @Override
+        public CharacterStream mapException(ToCharFunction<E> mapper) {
+            mIteratorWrapper.mapException(mExceptionClass, mapper);
+            return CharacterStreamImpl.this;
+        }
+
+        @Override
+        public CharacterStream consume(Consumer<E> consumer) {
+            mIteratorWrapper.consumeException(mExceptionClass, consumer);
+            return CharacterStreamImpl.this;
+        }
+
+        @Override
+        public <I extends RuntimeException> CharacterStream rethrow(Function<E, I> mapper) {
+            mIteratorWrapper.consumeException(mExceptionClass, e -> {
+                throw mapper.apply(e);
+            });
+            return CharacterStreamImpl.this;
+        }
+
+        @Override
+        public CharacterStream ignore() {
+            mIteratorWrapper.consumeException(mExceptionClass, e -> {
+            });
+            return CharacterStreamImpl.this;
         }
     }
 }

@@ -18,8 +18,8 @@ import com.github.wrdlbrnft.streamcompat.function.Supplier;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStream;
 import com.github.wrdlbrnft.streamcompat.iterator.primtive.DoubleIterator;
 import com.github.wrdlbrnft.streamcompat.longstream.LongStream;
-import com.github.wrdlbrnft.streamcompat.stream.Stream;
 import com.github.wrdlbrnft.streamcompat.optionals.OptionalDouble;
+import com.github.wrdlbrnft.streamcompat.stream.Stream;
 
 /**
  * The primitive version of a {@link Stream} which contains a sequence of {@code double} values.
@@ -27,28 +27,24 @@ import com.github.wrdlbrnft.streamcompat.optionals.OptionalDouble;
 public interface DoubleStream extends Iterable<Double> {
 
     /**
-     *
      * @param predicate
      * @return
      */
     DoubleStream filter(DoublePredicate predicate);
 
     /**
-     *
      * @param mapper
      * @return
      */
     DoubleStream map(DoubleUnaryOperator mapper);
 
     /**
-     *
      * @param mapper
      * @return
      */
     DoubleStream flatMap(DoubleFunction<? extends DoubleStream> mapper);
 
     /**
-     *
      * @param mapper
      * @param <U>
      * @return
@@ -56,62 +52,53 @@ public interface DoubleStream extends Iterable<Double> {
     <U> Stream<U> mapToObj(DoubleFunction<? extends U> mapper);
 
     /**
-     *
      * @param mapper
      * @return
      */
     LongStream mapToLong(DoubleToLongFunction mapper);
 
     /**
-     *
      * @param mapper
      * @return
      */
     FloatStream mapToFloat(DoubleToFloatFunction mapper);
 
     /**
-     *
      * @param mapper
      * @return
      */
     IntStream mapToInt(DoubleToIntFunction mapper);
 
     /**
-     *
      * @param mapper
      * @return
      */
     CharacterStream mapToChar(DoubleToCharFunction mapper);
 
     /**
-     *
      * @param mapper
      * @return
      */
     ByteStream mapToByte(DoubleToByteFunction mapper);
 
     /**
-     *
      * @return
      */
     Stream<Double> boxed();
 
     /**
-     *
      * @param limit
      * @return
      */
     DoubleStream limit(long limit);
 
     /**
-     *
      * @param count
      * @return
      */
     DoubleStream skip(long count);
 
     /**
-     *
      * @param identity
      * @param op
      * @return
@@ -119,14 +106,12 @@ public interface DoubleStream extends Iterable<Double> {
     double reduce(double identity, DoubleBinaryOperator op);
 
     /**
-     *
      * @param op
      * @return
      */
     OptionalDouble reduce(DoubleBinaryOperator op);
 
     /**
-     *
      * @param supplier
      * @param accumulator
      * @param <R>
@@ -136,82 +121,77 @@ public interface DoubleStream extends Iterable<Double> {
 
     /**
      *
+     * @param cls
+     * @param <E>
+     * @return
+     */
+    <E extends Throwable> DoubleExceptional<E> exception(Class<E> cls);
+
+    /**
      * @return
      */
     double sum();
 
     /**
-     *
      * @return
      */
     OptionalDouble min();
 
     /**
-     *
      * @return
      */
     OptionalDouble max();
 
     /**
-     *
      * @return
      */
     long count();
 
     /**
-     *
      * @return
      */
     DoubleStream sort();
 
     /**
-     *
      * @return
      */
     OptionalDouble average();
 
     /**
-     *
      * @return
      */
     OptionalDouble findFirst();
 
     /**
-     *
      * @param predicate
      * @return
      */
     boolean anyMatch(DoublePredicate predicate);
 
     /**
-     *
      * @param predicate
      * @return
      */
     boolean allMatch(DoublePredicate predicate);
 
     /**
-     *
      * @param predicate
      * @return
      */
     boolean noneMatch(DoublePredicate predicate);
 
     /**
-     *
      * @return
      */
     double[] toArray();
 
     /**
-     *
      * @return
      */
     @Override
     DoubleIterator iterator();
 
     /**
-     *
      * @param action
      */
     void forEach(DoubleConsumer action);

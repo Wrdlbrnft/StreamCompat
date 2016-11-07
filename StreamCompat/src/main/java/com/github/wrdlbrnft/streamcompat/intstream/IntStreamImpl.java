@@ -8,6 +8,8 @@ import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStream;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStreamCompat;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStream;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStreamCompat;
+import com.github.wrdlbrnft.streamcompat.function.Consumer;
+import com.github.wrdlbrnft.streamcompat.function.Function;
 import com.github.wrdlbrnft.streamcompat.function.IntBinaryOperator;
 import com.github.wrdlbrnft.streamcompat.function.IntConsumer;
 import com.github.wrdlbrnft.streamcompat.function.IntFunction;
@@ -20,6 +22,7 @@ import com.github.wrdlbrnft.streamcompat.function.IntToLongFunction;
 import com.github.wrdlbrnft.streamcompat.function.IntUnaryOperator;
 import com.github.wrdlbrnft.streamcompat.function.ObjIntConsumer;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
+import com.github.wrdlbrnft.streamcompat.function.ToIntFunction;
 import com.github.wrdlbrnft.streamcompat.iterator.array.IntArrayIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.base.BaseIterator;
 import com.github.wrdlbrnft.streamcompat.iterator.child.ByteChildIterator;
@@ -46,10 +49,12 @@ import java.util.Arrays;
 class IntStreamImpl implements IntStream {
 
     private static final int DEFAULT_ARRAY_SIZE = 16;
+
+    private final IntIteratorWrapper mIteratorWrapper = new IntIteratorWrapperImpl();
     private final IntIterator mIterator;
 
     IntStreamImpl(IntIterator iterator) {
-        mIterator = iterator;
+        mIterator = mIteratorWrapper.apply(iterator);
     }
 
     @Override
@@ -246,6 +251,11 @@ class IntStreamImpl implements IntStream {
     }
 
     @Override
+    public <E extends Throwable> IntExceptional<E> exception(Class<E> cls) {
+        return new IntExceptionalImpl<>(cls);
+    }
+
+    @Override
     public int sum() {
         return reduce(0, (a, b) -> a + b);
     }
@@ -387,6 +397,42 @@ class IntStreamImpl implements IntStream {
         @Override
         public Integer next() {
             return nextInt();
+        }
+    }
+
+    private class IntExceptionalImpl<E extends Throwable> implements IntExceptional<E> {
+
+        private final Class<E> mExceptionClass;
+
+        public IntExceptionalImpl(Class<E> exceptionClass) {
+            mExceptionClass = exceptionClass;
+        }
+
+        @Override
+        public IntStream mapException(ToIntFunction<E> mapper) {
+            mIteratorWrapper.mapException(mExceptionClass, mapper);
+            return IntStreamImpl.this;
+        }
+
+        @Override
+        public IntStream consume(Consumer<E> consumer) {
+            mIteratorWrapper.consumeException(mExceptionClass, consumer);
+            return IntStreamImpl.this;
+        }
+
+        @Override
+        public <I extends RuntimeException> IntStream rethrow(Function<E, I> mapper) {
+            mIteratorWrapper.consumeException(mExceptionClass, e -> {
+                throw mapper.apply(e);
+            });
+            return IntStreamImpl.this;
+        }
+
+        @Override
+        public IntStream ignore() {
+            mIteratorWrapper.consumeException(mExceptionClass, e -> {
+            });
+            return IntStreamImpl.this;
         }
     }
 }

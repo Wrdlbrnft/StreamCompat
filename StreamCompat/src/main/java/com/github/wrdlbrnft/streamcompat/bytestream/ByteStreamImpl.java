@@ -16,8 +16,11 @@ import com.github.wrdlbrnft.streamcompat.function.ByteToFloatFunction;
 import com.github.wrdlbrnft.streamcompat.function.ByteToIntFunction;
 import com.github.wrdlbrnft.streamcompat.function.ByteToLongFunction;
 import com.github.wrdlbrnft.streamcompat.function.ByteUnaryOperator;
+import com.github.wrdlbrnft.streamcompat.function.Consumer;
+import com.github.wrdlbrnft.streamcompat.function.Function;
 import com.github.wrdlbrnft.streamcompat.function.ObjByteConsumer;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
+import com.github.wrdlbrnft.streamcompat.function.ToByteFunction;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStream;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStreamCompat;
 import com.github.wrdlbrnft.streamcompat.iterator.array.ByteArrayIterator;
@@ -47,10 +50,11 @@ class ByteStreamImpl implements ByteStream {
 
     private static final int DEFAULT_ARRAY_SIZE = 16;
 
+    private final ByteIteratorWrapper mIteratorWrapper = new ByteIteratorWrapperImpl();
     private final ByteIterator mIterator;
 
     ByteStreamImpl(ByteIterator iterator) {
-        mIterator = iterator;
+        mIterator = mIteratorWrapper.apply(iterator);
     }
 
     @Override
@@ -247,6 +251,11 @@ class ByteStreamImpl implements ByteStream {
         return sink;
     }
 
+    @Override
+    public <E extends Throwable> ByteExceptional<E> exception(Class<E> cls) {
+        return new ByteExceptionalImpl<>(cls);
+    }
+
     public byte sum() {
         return reduce((byte) 0, (a, b) -> (byte) (a + b));
     }
@@ -387,6 +396,42 @@ class ByteStreamImpl implements ByteStream {
         @Override
         public Byte next() {
             return nextByte();
+        }
+    }
+
+    private class ByteExceptionalImpl<E extends Throwable> implements ByteExceptional<E> {
+
+        private final Class<E> mExceptionClass;
+
+        public ByteExceptionalImpl(Class<E> exceptionClass) {
+            mExceptionClass = exceptionClass;
+        }
+
+        @Override
+        public ByteStream mapException(ToByteFunction<E> mapper) {
+            mIteratorWrapper.mapException(mExceptionClass, mapper);
+            return ByteStreamImpl.this;
+        }
+
+        @Override
+        public ByteStream consume(Consumer<E> consumer) {
+            mIteratorWrapper.consumeException(mExceptionClass, consumer);
+            return ByteStreamImpl.this;
+        }
+
+        @Override
+        public <I extends RuntimeException> ByteStream rethrow(Function<E, I> mapper) {
+            mIteratorWrapper.consumeException(mExceptionClass, e -> {
+                throw mapper.apply(e);
+            });
+            return ByteStreamImpl.this;
+        }
+
+        @Override
+        public ByteStream ignore() {
+            mIteratorWrapper.consumeException(mExceptionClass, e -> {
+            });
+            return ByteStreamImpl.this;
         }
     }
 }

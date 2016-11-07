@@ -8,6 +8,8 @@ import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStream;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStreamCompat;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStream;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStreamCompat;
+import com.github.wrdlbrnft.streamcompat.function.Consumer;
+import com.github.wrdlbrnft.streamcompat.function.Function;
 import com.github.wrdlbrnft.streamcompat.function.LongBinaryOperator;
 import com.github.wrdlbrnft.streamcompat.function.LongConsumer;
 import com.github.wrdlbrnft.streamcompat.function.LongFunction;
@@ -20,6 +22,7 @@ import com.github.wrdlbrnft.streamcompat.function.LongToIntFunction;
 import com.github.wrdlbrnft.streamcompat.function.LongUnaryOperator;
 import com.github.wrdlbrnft.streamcompat.function.ObjLongConsumer;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
+import com.github.wrdlbrnft.streamcompat.function.ToLongFunction;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStream;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStreamCompat;
 import com.github.wrdlbrnft.streamcompat.iterator.array.LongArrayIterator;
@@ -47,9 +50,10 @@ class LongStreamImpl implements LongStream {
 
     private static final int DEFAULT_ARRAY_SIZE = 16;
     private final LongIterator mIterator;
+    private final LongIteratorWrapper mIteratorWrapper = new LongIteratorWrapperImpl();
 
     LongStreamImpl(LongIterator iterator) {
-        mIterator = iterator;
+        mIterator = mIteratorWrapper.apply(iterator);
     }
 
     @Override
@@ -248,6 +252,11 @@ class LongStreamImpl implements LongStream {
     }
 
     @Override
+    public <E extends Throwable> LongExceptional<E> exception(Class<E> cls) {
+        return new LongExceptionalImpl<>(cls);
+    }
+
+    @Override
     public long sum() {
         return reduce(0, (a, b) -> a + b);
     }
@@ -397,6 +406,42 @@ class LongStreamImpl implements LongStream {
         @Override
         public Long next() {
             return nextLong();
+        }
+    }
+
+    private class LongExceptionalImpl<E extends Throwable> implements LongExceptional<E> {
+
+        private final Class<E> mExceptionClass;
+
+        public LongExceptionalImpl(Class<E> exceptionClass) {
+            mExceptionClass = exceptionClass;
+        }
+
+        @Override
+        public LongStream mapException(ToLongFunction<E> mapper) {
+            mIteratorWrapper.mapException(mExceptionClass, mapper);
+            return LongStreamImpl.this;
+        }
+
+        @Override
+        public LongStream consume(Consumer<E> consumer) {
+            mIteratorWrapper.consumeException(mExceptionClass, consumer);
+            return LongStreamImpl.this;
+        }
+
+        @Override
+        public <I extends RuntimeException> LongStream rethrow(Function<E, I> mapper) {
+            mIteratorWrapper.consumeException(mExceptionClass, e -> {
+                throw mapper.apply(e);
+            });
+            return LongStreamImpl.this;
+        }
+
+        @Override
+        public LongStream ignore() {
+            mIteratorWrapper.consumeException(mExceptionClass, e -> {
+            });
+            return LongStreamImpl.this;
         }
     }
 }

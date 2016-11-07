@@ -6,6 +6,7 @@ import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStream;
 import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStreamCompat;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStream;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStreamCompat;
+import com.github.wrdlbrnft.streamcompat.function.Consumer;
 import com.github.wrdlbrnft.streamcompat.function.FloatBinaryOperator;
 import com.github.wrdlbrnft.streamcompat.function.FloatConsumer;
 import com.github.wrdlbrnft.streamcompat.function.FloatFunction;
@@ -16,8 +17,10 @@ import com.github.wrdlbrnft.streamcompat.function.FloatToDoubleFunction;
 import com.github.wrdlbrnft.streamcompat.function.FloatToIntFunction;
 import com.github.wrdlbrnft.streamcompat.function.FloatToLongFunction;
 import com.github.wrdlbrnft.streamcompat.function.FloatUnaryOperator;
+import com.github.wrdlbrnft.streamcompat.function.Function;
 import com.github.wrdlbrnft.streamcompat.function.ObjFloatConsumer;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
+import com.github.wrdlbrnft.streamcompat.function.ToFloatFunction;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStream;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStreamCompat;
 import com.github.wrdlbrnft.streamcompat.iterator.array.FloatArrayIterator;
@@ -46,10 +49,12 @@ import java.util.Arrays;
 class FloatStreamImpl implements FloatStream {
 
     private static final int DEFAULT_ARRAY_SIZE = 16;
+
+    private final FloatIteratorWrapper mIteratorWrapper = new FloatIteratorWrapperImpl();
     private final FloatIterator mIterator;
 
     FloatStreamImpl(FloatIterator iterator) {
-        mIterator = iterator;
+        mIterator = mIteratorWrapper.apply(iterator);
     }
 
     @Override
@@ -246,6 +251,11 @@ class FloatStreamImpl implements FloatStream {
     }
 
     @Override
+    public <E extends Throwable> FloatExceptional<E> exception(Class<E> cls) {
+        return new FloatExceptionalImpl<>(cls);
+    }
+
+    @Override
     public float sum() {
         float[] summation = collect(() -> new float[3],
                 (ll, d) -> {
@@ -395,6 +405,42 @@ class FloatStreamImpl implements FloatStream {
         @Override
         public Float next() {
             return nextFloat();
+        }
+    }
+
+    private class FloatExceptionalImpl<E extends Throwable> implements FloatExceptional<E> {
+
+        private final Class<E> mExceptionClass;
+
+        public FloatExceptionalImpl(Class<E> exceptionClass) {
+            mExceptionClass = exceptionClass;
+        }
+
+        @Override
+        public FloatStream mapException(ToFloatFunction<E> mapper) {
+            mIteratorWrapper.mapException(mExceptionClass, mapper);
+            return FloatStreamImpl.this;
+        }
+
+        @Override
+        public FloatStream consume(Consumer<E> consumer) {
+            mIteratorWrapper.consumeException(mExceptionClass, consumer);
+            return FloatStreamImpl.this;
+        }
+
+        @Override
+        public <I extends RuntimeException> FloatStream rethrow(Function<E, I> mapper) {
+            mIteratorWrapper.consumeException(mExceptionClass, e -> {
+                throw mapper.apply(e);
+            });
+            return FloatStreamImpl.this;
+        }
+
+        @Override
+        public FloatStream ignore() {
+            mIteratorWrapper.consumeException(mExceptionClass, e -> {
+            });
+            return FloatStreamImpl.this;
         }
     }
 }

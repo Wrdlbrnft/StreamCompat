@@ -1,11 +1,11 @@
-package com.github.wrdlbrnft.streamcompat.stream;
+package com.github.wrdlbrnft.streamcompat.floatstream;
 
 import com.github.wrdlbrnft.streamcompat.exceptions.StreamException;
 import com.github.wrdlbrnft.streamcompat.function.Consumer;
-import com.github.wrdlbrnft.streamcompat.function.Function;
+import com.github.wrdlbrnft.streamcompat.function.ToFloatFunction;
+import com.github.wrdlbrnft.streamcompat.iterator.primtive.FloatIterator;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -15,18 +15,18 @@ import java.util.NoSuchElementException;
  * Date: 01/11/2016
  */
 
-class BaseIteratorWrapperImpl<T> implements IteratorWrapper<T> {
+class FloatIteratorWrapperImpl implements FloatIteratorWrapper {
 
-    private interface Wrapper<T> {
+    private interface Wrapper {
         <E extends Throwable> void consumeException(Class<E> exceptionClass, Consumer<E> consumer);
-        <E extends Throwable> void mapException(Class<E> exceptionClass, Function<E, T> mapper);
+        <E extends Throwable> void mapException(Class<E> exceptionClass, ToFloatFunction<E> mapper);
     }
 
-    private Wrapper<T> mWrapper;
+    private Wrapper mWrapper;
 
     @Override
-    public Iterator<T> apply(Iterator<T> iterator) {
-        final WrapperImpl<T> wrapper = new WrapperImpl<>(iterator);
+    public FloatIterator apply(FloatIterator iterator) {
+        final WrapperImpl wrapper = new WrapperImpl(iterator);
         mWrapper = wrapper;
         return wrapper;
     }
@@ -37,16 +37,16 @@ class BaseIteratorWrapperImpl<T> implements IteratorWrapper<T> {
     }
 
     @Override
-    public <E extends Throwable> void mapException(Class<E> exceptionClass, Function<E, T> mapper) {
+    public <E extends Throwable> void mapException(Class<E> exceptionClass, ToFloatFunction<E> mapper) {
         mWrapper.mapException(exceptionClass, mapper);
     }
 
-    private static abstract class ExceptionHandler<T, E extends Throwable> {
+    private static abstract class ExceptionHandler<E extends Throwable> {
 
-        interface Result<T> {
+        interface Result {
             boolean doesHandle();
             boolean hasMappedValue();
-            T getMappedValue();
+            float getMappedValue();
         }
 
         private final Class<E> mExceptionClass;
@@ -56,18 +56,18 @@ class BaseIteratorWrapperImpl<T> implements IteratorWrapper<T> {
         }
 
         @SuppressWarnings("unchecked")
-        Result<T> handle(Throwable exception) {
+        Result handle(Throwable exception) {
             if (!mExceptionClass.isAssignableFrom(exception.getClass())) {
-                return new ResultImpl<>(false, false, null);
+                return new ResultImpl(false, false, 0);
             }
 
             return performHandle((E) exception);
         }
 
-        protected abstract Result<T> performHandle(E exception);
+        protected abstract Result performHandle(E exception);
     }
 
-    private static class ConsumeExceptionHandler<T, E extends Throwable> extends ExceptionHandler<T, E> {
+    private static class ConsumeExceptionHandler<E extends Throwable> extends ExceptionHandler<E> {
 
         private final Consumer<E> mConsumer;
 
@@ -77,37 +77,37 @@ class BaseIteratorWrapperImpl<T> implements IteratorWrapper<T> {
         }
 
         @Override
-        protected Result<T> performHandle(E exception) {
+        protected Result performHandle(E exception) {
             mConsumer.accept(exception);
-            return new ResultImpl<>(true, false, null);
+            return new ResultImpl(true, false, 0);
         }
     }
 
-    private static class MappingExceptionHandler<T, E extends Throwable> extends ExceptionHandler<T, E> {
+    private static class MappingExceptionHandler<E extends Throwable> extends ExceptionHandler<E> {
 
-        private final Function<E, T> mMapper;
+        private final ToFloatFunction<E> mMapper;
 
-        private MappingExceptionHandler(Class<E> exceptionClass, Function<E, T> mapper) {
+        private MappingExceptionHandler(Class<E> exceptionClass, ToFloatFunction<E> mapper) {
             super(exceptionClass);
             mMapper = mapper;
         }
 
         @Override
-        protected Result<T> performHandle(E exception) {
-            return new ResultImpl<>(true, true, mMapper.apply(exception));
+        protected Result performHandle(E exception) {
+            return new ResultImpl(true, true, mMapper.apply(exception));
         }
     }
 
-    private static class WrapperImpl<T> implements Iterator<T>, Wrapper<T> {
+    private static class WrapperImpl implements FloatIterator, Wrapper {
 
-        private final List<ExceptionHandler<T, ?>> mExceptionHandlers = new ArrayList<>();
-        private final Iterator<T> mIterator;
+        private final List<ExceptionHandler<?>> mExceptionHandlers = new ArrayList<>();
+        private final FloatIterator mIterator;
 
         private boolean mEvaluated = false;
         private boolean mHasNext = false;
-        private T mNext;
+        private float mNext;
 
-        private WrapperImpl(Iterator<T> iterator) {
+        private WrapperImpl(FloatIterator iterator) {
             mIterator = iterator;
         }
 
@@ -121,9 +121,18 @@ class BaseIteratorWrapperImpl<T> implements IteratorWrapper<T> {
         }
 
         @Override
-        public T next() {
+        public Float next() {
+            return nextFloat();
+        }
+
+        boolean doesHandleExceptions() {
+            return !mExceptionHandlers.isEmpty();
+        }
+
+        @Override
+        public float nextFloat() {
             if (!doesHandleExceptions()) {
-                return mIterator.next();
+                return mIterator.nextFloat();
             }
             evaluate();
             mEvaluated = false;
@@ -131,10 +140,6 @@ class BaseIteratorWrapperImpl<T> implements IteratorWrapper<T> {
                 return mNext;
             }
             throw new NoSuchElementException();
-        }
-
-        boolean doesHandleExceptions() {
-            return !mExceptionHandlers.isEmpty();
         }
 
         private void evaluate() {
@@ -148,8 +153,8 @@ class BaseIteratorWrapperImpl<T> implements IteratorWrapper<T> {
                     mHasNext = true;
                     return;
                 } catch (Exception e) {
-                    for (ExceptionHandler<T, ?> handler : mExceptionHandlers) {
-                        final ExceptionHandler.Result<T> result = handler.handle(e);
+                    for (ExceptionHandler<?> handler : mExceptionHandlers) {
+                        final ExceptionHandler.Result result = handler.handle(e);
                         if (result.doesHandle()) {
                             if (result.hasMappedValue()) {
                                 mNext = result.getMappedValue();
@@ -171,18 +176,18 @@ class BaseIteratorWrapperImpl<T> implements IteratorWrapper<T> {
         }
 
         @Override
-        public <E extends Throwable> void mapException(Class<E> exceptionClass, Function<E, T> mapper) {
+        public <E extends Throwable> void mapException(Class<E> exceptionClass, ToFloatFunction<E> mapper) {
             mExceptionHandlers.add(new MappingExceptionHandler<>(exceptionClass, mapper));
         }
     }
 
-    private static class ResultImpl<T> implements ExceptionHandler.Result<T> {
+    private static class ResultImpl implements ExceptionHandler.Result {
 
         private final boolean mDoesHandle;
         private final boolean mHasMappedValue;
-        private final T mMappedValue;
+        private final float mMappedValue;
 
-        private ResultImpl(boolean doesHandle, boolean hasMappedValue, T mappedValue) {
+        private ResultImpl(boolean doesHandle, boolean hasMappedValue, float mappedValue) {
             mDoesHandle = doesHandle;
             mHasMappedValue = hasMappedValue;
             mMappedValue = mappedValue;
@@ -199,7 +204,7 @@ class BaseIteratorWrapperImpl<T> implements IteratorWrapper<T> {
         }
 
         @Override
-        public T getMappedValue() {
+        public float getMappedValue() {
             return mMappedValue;
         }
     }
