@@ -46,18 +46,21 @@ public interface Stream<T> extends Iterable<T> {
     /**
      * Maps the elements in the {@link Stream} according to a mapping function.
      * <p>In simpler terms transforms the elements based on the supplied mapping function.
-     * As an example:</p>zz
+     * As an example:</p>
      * <pre>
+     * {@code
      * final List<String> strings = StreamCompat.of("Android", "Google", "Alphabet")
-     *         .map(text -> text.substring(0, 2))z
-     *         .collect(Collectors.toList());
+     *              .map(text -> text.substring(0, 2))
+     *              .collect(Collectors.toList());
+     * }
      * </pre>
      * The map operation the above {@link Stream} will call substring(0, 2) on every {@link String} in the {@link Stream}
      * and replace the original {@link String} in the {@link Stream} with the result of the substring(0, 2) call.
      * The final list after collecting then contains the following entries:
      * <p>
-     * <p>"An", "Go", "Al"</p>
-     * z
+     * <pre>
+     *        "An", "Go", "Al"
+     * </pre>
      *
      * @param mapper A {@link Function} which map the elements in the {@link Stream} to some other element
      * @param <R>    The type of the elements after transformation.
@@ -251,7 +254,7 @@ public interface Stream<T> extends Iterable<T> {
 
     /**
      * Limits how many elements will be evaluated in the {@link Stream}. If the current {@link Stream}
-     * contains more elements then the supplied limit then all remaining elements will be ignored.
+     * contains more elements than the supplied limit then all remaining elements will be ignored.
      *
      * @param maxSize Maximum number of elements which should be evaluated in the current {@link Stream}.
      * @return Returns a new {@link Stream} which contains all elements up to the supplied limit.
@@ -259,7 +262,7 @@ public interface Stream<T> extends Iterable<T> {
     Stream<T> limit(long maxSize);
 
     /**
-     * Skips the supplied number of elements at the start ozf the {@link Stream}. If the number of
+     * Skips the supplied number of elements at the start of the {@link Stream}. If the number of
      * elements in the {@link Stream} is lower than the skipped count an empty {@link Stream} will
      * be returned.
      *
@@ -375,9 +378,11 @@ public interface Stream<T> extends Iterable<T> {
     /**
      * Collects all the elements in the {@link Stream} into an array. You can just use it like this:
      * <pre>
+     * {@code
      * final String[] strings = StreamCompat.of("Android", "Google", "Alphabet")
      *         .map(text -> text.substring(0, 2))
      *         .toArray(String[]::new);
+     * }
      * </pre>
      * <p>
      * This is a terminal operation.

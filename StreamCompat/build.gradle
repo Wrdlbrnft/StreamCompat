@@ -32,11 +32,28 @@ dependencies {
 
 final bintrayUser = hasProperty('bintray_user') ? property('bintray_user') : ''
 final bintrayApiKey = hasProperty('bintray_api_key') ? property('bintray_api_key') : ''
-final versionName = hasProperty('version_name') ? property('version_name') : ''
+final versionName = hasProperty('version_name') ? property('version_name') : '0.1.0.0'
 
 task sourceJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
     classifier 'source'
+}
+
+task javadoc(type: Javadoc, dependsOn: 'assembleRelease') {
+    final variant = android.libraryVariants['release']
+    source = variant.javaCompile.source
+    title = 'StreamCompat'
+    options.links('http://docs.oracle.com/javase/8/docs/api/');
+    options.linksOffline('http://d.android.com/reference', "${android.sdkDirectory}/docs/reference");
+    classpath += files(android.libraryVariants.javaCompile.classpath.files)
+    classpath += files(android.getBootClasspath())
+    exclude '**/BuildConfig.java'
+    exclude '**/R.java'
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
 }
 
 publishing {
@@ -46,6 +63,7 @@ publishing {
             artifactId 'stream-compat'
             version versionName
             artifact sourceJar
+            artifact javadocJar
             artifact new File(buildDir, '/outputs/aar/StreamCompat-release.aar')
         }
     }

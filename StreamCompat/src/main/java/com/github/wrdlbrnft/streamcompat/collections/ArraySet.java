@@ -11,8 +11,8 @@ import java.util.Set;
 
 /**
  * <p>
- * Created with Android Studio<br/>
- * User: Xaver<br/>
+ * Created with Android Studio<br>
+ * User: Xaver<br>
  * Date: 28/03/16
  *</p>
  *
@@ -262,7 +262,6 @@ public final class ArraySet<E> implements Collection<E>, Set<E> {
         }
     }
 
-    /** {@hide} */
     public ArraySet(Collection<E> set) {
         this();
         if (set != null) {

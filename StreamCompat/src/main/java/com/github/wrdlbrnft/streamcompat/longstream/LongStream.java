@@ -18,9 +18,9 @@ import com.github.wrdlbrnft.streamcompat.function.ObjLongConsumer;
 import com.github.wrdlbrnft.streamcompat.function.Supplier;
 import com.github.wrdlbrnft.streamcompat.intstream.IntStream;
 import com.github.wrdlbrnft.streamcompat.iterator.primtive.LongIterator;
-import com.github.wrdlbrnft.streamcompat.stream.Stream;
 import com.github.wrdlbrnft.streamcompat.optionals.OptionalDouble;
 import com.github.wrdlbrnft.streamcompat.optionals.OptionalLong;
+import com.github.wrdlbrnft.streamcompat.stream.Stream;
 
 /**
  * The primitive version of a {@link Stream} which contains a sequence of {@code long} values.
@@ -113,35 +113,44 @@ public interface LongStream extends Iterable<Long> {
     Stream<Long> boxed();
 
     /**
+     * Limits how many elements will be evaluated in the {@link LongStream}. If the current {@link LongStream}
+     * contains more elements than the supplied limit then all remaining elements will be ignored.
      *
-     *
-     * @param maxSize
-     * @return
+     * @param maxSize Maximum number of elements which should be evaluated in the current {@link Stream}.
+     * @return Returns a new {@link Stream} which contains all elements up to the supplied limit.
      */
     LongStream limit(long maxSize);
 
     /**
+     * Skips the supplied number of elements at the start of the {@link LongStream}. If the number of
+     * elements in the {@link LongStream} is lower than the skipped count an empty {@link LongStream} will
+     * be returned.
      *
-     *
-     * @param count
-     * @return
+     * @param count How many elements should be skipped
+     * @return Returns a new {@link LongStream} which does not contain any of the skipped elements.
      */
     LongStream skip(long count);
 
     /**
-     * @param identity
-     * @param op
-     * @return
+     * Reduces the elements in the {@link LongStream} according to the supplied {@link LongBinaryOperator}.
+     *
+     * @param identity The identity value used for the reduction.
+     * @param op       The {@link LongBinaryOperator} used for the reduction.
+     * @return Returns the result of the reduction operation as a {@link long} value.
      */
     long reduce(long identity, LongBinaryOperator op);
 
     /**
-     * @param op
-     * @return
+     * Reduces the elements in the {@link LongStream} according to the supplied {@link LongBinaryOperator}.
+     *
+     * @param op The {@link LongBinaryOperator} used for the reduction.
+     * @return Returns the result of the reduction operation as an {@link OptionalLong} value.
      */
     OptionalLong reduce(LongBinaryOperator op);
 
     /**
+     * Collects the elements in the {@link LongStream}
+     *
      * @param supplier
      * @param accumulator
      * @param <R>
@@ -149,9 +158,18 @@ public interface LongStream extends Iterable<Long> {
      */
     <R> R collect(Supplier<R> supplier, ObjLongConsumer<R> accumulator);
 
+    /**
+     *
+     *
+     * @param cls
+     * @param <E>
+     * @return
+     */
     <E extends Throwable> LongExceptional<E> exception(Class<E> cls);
 
     /**
+     *
+     *
      * @return
      */
     long sum();
@@ -172,8 +190,9 @@ public interface LongStream extends Iterable<Long> {
     long count();
 
     /**
+     * Sorts the elements in the {@link LongStream} in ascending order.
      *
-     * @return
+     * @return Returns a new {@link LongStream} which contains the elements in ascending order.
      */
     LongStream sort();
 
