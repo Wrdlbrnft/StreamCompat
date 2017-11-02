@@ -13,7 +13,9 @@ import org.junit.Test;
 import java.text.ParseException;
 
 /**
- * Created by kapeller on 21/03/16.
+ * Created with Android Studio<br>
+ * User: kapeller<br>
+ * Date: 21/03/16
  */
 public class GeneralTests {
 
@@ -46,6 +48,17 @@ public class GeneralTests {
                 .toArray(String[]::new);
 
         final String[] expected = new String[]{"Apple", "Google", "Google"};
+        Assert.assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void testCharacterStreamSkip() {
+        final char[] actual = StreamCompat.of("Android", " ", "Apple", "Google", "Google")
+                .flatMapToChar(text -> CharacterStreamCompat.of(text.toCharArray()))
+                .skip(20)
+                .toArray();
+
+        final char[] expected = new char[]{'o', 'o', 'g', 'l', 'e'};
         Assert.assertArrayEquals(expected, actual);
     }
 

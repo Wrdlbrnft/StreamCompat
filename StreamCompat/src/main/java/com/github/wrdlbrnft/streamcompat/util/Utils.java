@@ -3,7 +3,9 @@ package com.github.wrdlbrnft.streamcompat.util;
 import java.util.Iterator;
 
 /**
- * Created by kapeller on 10/03/16.
+ * Created with Android Studio<br>
+ * User: kapeller<br>
+ * Date: 10/03/16
  */
 public class Utils {
 

@@ -1,5 +1,7 @@
 package com.github.wrdlbrnft.streamcompat.bytestream;
 
+import android.support.annotation.NonNull;
+
 import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStream;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStream;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStream;
@@ -172,6 +174,7 @@ public interface ByteStream extends Iterable<Byte> {
     /**
      * @return
      */
+    @NonNull
     @Override
     ByteIterator iterator();
 

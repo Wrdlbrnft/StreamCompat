@@ -1,7 +1,9 @@
 package com.github.wrdlbrnft.streamcompat.util;
 
 /**
- * Created by kapeller on 21/03/16.
+ * Created with Android Studio<br>
+ * User: kapeller<br>
+ * Date: 21/03/16
  */
 public class KahanSummation {
 

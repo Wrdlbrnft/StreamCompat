@@ -1,5 +1,7 @@
 package com.github.wrdlbrnft.streamcompat.doublestream;
 
+import android.support.annotation.NonNull;
+
 import com.github.wrdlbrnft.streamcompat.bytestream.ByteStream;
 import com.github.wrdlbrnft.streamcompat.bytestream.ByteStreamCompat;
 import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStream;
@@ -44,7 +46,9 @@ import com.github.wrdlbrnft.streamcompat.util.Utils;
 import java.util.Arrays;
 
 /**
- * Created by kapeller on 21/03/16.
+ * Created with Android Studio<br>
+ * User: kapeller<br>
+ * Date: 21/03/16
  */
 class DoubleStreamImpl implements DoubleStream {
 
@@ -164,6 +168,7 @@ class DoubleStreamImpl implements DoubleStream {
         ));
     }
 
+    @NonNull
     @Override
     public DoubleIterator iterator() {
         return mIterator;

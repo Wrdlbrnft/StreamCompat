@@ -1,5 +1,7 @@
 package com.github.wrdlbrnft.streamcompat.longstream;
 
+import android.support.annotation.NonNull;
+
 import com.github.wrdlbrnft.streamcompat.bytestream.ByteStream;
 import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStream;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStream;
@@ -232,6 +234,7 @@ public interface LongStream extends Iterable<Long> {
     /**
      * @return
      */
+    @NonNull
     @Override
     LongIterator iterator();
 

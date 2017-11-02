@@ -1,13 +1,13 @@
 package com.github.wrdlbrnft.streamcompat.stream;
 
 import android.support.v4.util.ArrayMap;
+import android.support.v4.util.ArraySet;
 import android.support.v4.util.LongSparseArray;
 import android.util.SparseArray;
 
-import com.github.wrdlbrnft.streamcompat.collections.ArraySet;
-import com.github.wrdlbrnft.streamcompat.collections.compat.LongSparseArrayCompat;
-import com.github.wrdlbrnft.streamcompat.collections.compat.MapCompat;
-import com.github.wrdlbrnft.streamcompat.collections.compat.SparseArrayCompat;
+import com.github.wrdlbrnft.streamcompat.compat.LongSparseArrayCompat;
+import com.github.wrdlbrnft.streamcompat.compat.MapCompat;
+import com.github.wrdlbrnft.streamcompat.compat.SparseArrayCompat;
 import com.github.wrdlbrnft.streamcompat.function.BiConsumer;
 import com.github.wrdlbrnft.streamcompat.function.BinaryOperator;
 import com.github.wrdlbrnft.streamcompat.function.Function;
@@ -74,7 +74,7 @@ public class Collectors {
      * the elements in a {@link Stream}.
      */
     public static <T, L extends List<T>> Collector<T, ?, L> toList(Supplier<L> listSupplier) {
-        return new CollectorImpl<T, L, L>(
+        return new CollectorImpl<>(
                 listSupplier,
                 L::add,
                 (i) -> i
@@ -109,7 +109,7 @@ public class Collectors {
      * type based on the supplied {@link Comparator} with the elements from a {@link Stream}.
      */
     public static <T, L extends List<T>> Collector<T, ?, L> toOrderedList(Supplier<L> listSupplier, Comparator<T> comparator) {
-        return new CollectorImpl<T, L, L>(
+        return new CollectorImpl<>(
                 listSupplier,
                 L::add,
                 list -> {
@@ -145,7 +145,7 @@ public class Collectors {
      * desired type based on the natural order of the elements from a {@link Stream}.
      */
     public static <T extends Comparable<T>, L extends List<T>> Collector<T, ?, L> toOrderedList(Supplier<L> listSupplier) {
-        return new CollectorImpl<T, L, L>(
+        return new CollectorImpl<>(
                 listSupplier,
                 List::add,
                 list -> {
@@ -178,7 +178,7 @@ public class Collectors {
      * the elements of a {@link Stream}.
      */
     public static <T, S extends Set<T>> Collector<T, ?, S> toSet(Supplier<S> setSupplier) {
-        return new CollectorImpl<T, S, S>(
+        return new CollectorImpl<>(
                 setSupplier,
                 Set::add,
                 i -> i

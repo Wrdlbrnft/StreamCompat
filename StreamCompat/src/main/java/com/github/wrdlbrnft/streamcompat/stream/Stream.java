@@ -1,8 +1,9 @@
 package com.github.wrdlbrnft.streamcompat.stream;
 
+import android.support.annotation.NonNull;
+
 import com.github.wrdlbrnft.streamcompat.bytestream.ByteStream;
 import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStream;
-import com.github.wrdlbrnft.streamcompat.collections.ArraySet;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStream;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStream;
 import com.github.wrdlbrnft.streamcompat.function.BiConsumer;
@@ -219,7 +220,7 @@ public interface Stream<T> extends Iterable<T> {
     /**
      * Returns a {@link Stream} which contains only distinct elements of this {@link Stream}.
      * <p>
-     * For the sake of memory efficiency this operation uses an {@link ArraySet}
+     * For the sake of memory efficiency this operation uses an {@link android.support.v4.util.ArraySet}
      * internally to check for duplicate elements. This is the preferred option if this {@link Stream}
      * contains up to one or two thousand elements. For a large number of elements {@link Stream#distinct(Supplier)}
      * can be used to supply a different type of {@link Set} which prioritizes fast lookup times instead of
@@ -411,6 +412,7 @@ public interface Stream<T> extends Iterable<T> {
      *
      * @return Returns an {@link Iterator} which iterates over all elements in the {@link Stream}.
      */
+    @NonNull
     Iterator<T> iterator();
 
     /**

@@ -1,10 +1,12 @@
 package com.github.wrdlbrnft.streamcompat.stream;
 
+import android.support.annotation.NonNull;
+import android.support.v4.util.ArraySet;
+
 import com.github.wrdlbrnft.streamcompat.bytestream.ByteStream;
 import com.github.wrdlbrnft.streamcompat.bytestream.ByteStreamCompat;
 import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStream;
 import com.github.wrdlbrnft.streamcompat.characterstream.CharacterStreamCompat;
-import com.github.wrdlbrnft.streamcompat.collections.ArraySet;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStream;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStreamCompat;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStream;
@@ -48,7 +50,9 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * Created by kapeller on 10/03/16.
+ * Created with Android Studio<br>
+ * User: kapeller<br>
+ * Date: 10/03/16
  */
 class StreamImpl<T> implements Stream<T> {
 
@@ -478,6 +482,7 @@ class StreamImpl<T> implements Stream<T> {
         return Optional.empty();
     }
 
+    @NonNull
     @Override
     public Iterator<T> iterator() {
         return mIterator;

@@ -1,16 +1,15 @@
 apply plugin: 'com.android.library'
-apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion '25.0.0'
+    compileSdkVersion 26
+    buildToolsVersion '26.0.2'
 
     defaultConfig {
-        minSdkVersion 9
-        targetSdkVersion 25
+        minSdkVersion 14
+        targetSdkVersion 26
     }
 
     buildTypes {
@@ -19,6 +18,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
     compileOptions {
         sourceCompatibility 1.8
         targetCompatibility 1.8
@@ -26,13 +26,13 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:25.0.0'
+    compile 'com.android.support:support-v4:26.1.0'
     testCompile 'junit:junit:4.12'
 }
 
-final bintrayUser = hasProperty('bintray_user') ? property('bintray_user') : ''
-final bintrayApiKey = hasProperty('bintray_api_key') ? property('bintray_api_key') : ''
-final versionName = hasProperty('version_name') ? property('version_name') : '0.1.0.0'
+final bintrayUser = System.getenv('BINTRAY_USER') ? System.getenv('BINTRAY_USER') : ''
+final bintrayApiKey = System.getenv('BINTRAY_API_KEY') ? System.getenv('BINTRAY_API_KEY') : ''
+final versionName = System.getenv('TRAVIS_BUILD_NUMBER') ? "0.1.0.${System.getenv('TRAVIS_BUILD_NUMBER')}" : '0.1.0.0'
 
 task sourceJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs

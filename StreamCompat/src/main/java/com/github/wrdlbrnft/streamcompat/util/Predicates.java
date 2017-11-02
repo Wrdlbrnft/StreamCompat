@@ -3,7 +3,9 @@ package com.github.wrdlbrnft.streamcompat.util;
 import com.github.wrdlbrnft.streamcompat.function.Predicate;
 
 /**
- * Created by kapeller on 10/03/16.
+ * Created with Android Studio<br>
+ * User: kapeller<br>
+ * Date: 10/03/16
  */
 public class Predicates {
 

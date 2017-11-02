@@ -4,7 +4,9 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * Created by kapeller on 23/03/16.
+ * Created with Android Studio<br>
+ * User: kapeller<br>
+ * Date: 23/03/16
  */
 public class EmptyIterator<T> implements Iterator<T> {
 

@@ -2,7 +2,7 @@
 
 Use Streams everywhere just like you wish you always could!
 
-* **Works on every Android Device**: With the new Jack Compiler you can use all the things that make Java 8s Stream API so great on API level 7 and above. Don't feel like using the preview version of the build tools? Then just use Retrolambda in the meantime!
+* **Works on every Android Device**: StreamCompat can be used on 100% of all active Android Devices.
 * **Efficient and Performant**: Regardless of how many filter, map or flatMap statements you use every item in source collection will be evaluated **only once**. That means high performance that scales very well!
 * **Optimized for Mobile Devices**: This isn't just a straight backport of the Stream API! It uses an Iterator based implementation which avoids autoboxing wherever possible and defaults to memory efficient Collections to ensure that mobile developers can use it without having to worry about anything! 
 
@@ -20,63 +20,10 @@ final List<ViewModel> viewModels = StreamCompat.of(models)
 To use StreamCompat just add this to the dependencies closure in your build.gradle:
 
 ```
-compile 'com.github.wrdlbrnft:stream-compat:0.2.0.10'
+compile 'com.github.wrdlbrnft:stream-compat:0.3.0.11'
 ```
 
-[![Build Status](https://travis-ci.org/Wrdlbrnft/StreamCompat.svg?branch=master)](https://travis-ci.org/Wrdlbrnft/StreamCompat)
-
-To use method references and lambda expressions you either need to use the JACK compiler which is part of the preview build tools or if you don't want to do that you can just use Retrolambda instead!
-
-### Using Retrolambda
-
-To use Retrolambda just paste the following at the very top of your build.gradle:
-
-```
-buildscript {
-  repositories {
-     jcenter()
-  }
-
-  dependencies {
-     classpath 'me.tatarka:gradle-retrolambda:3.2.5'
-  }
-}
-```
-
-After that you just have to add `apply plugin: 'me.tatarka.retrolambda'` below all your other `apply plugin` statements:
-
-```groovy
-apply plugin: 'com.android.library' // or apply plugin: 'com.android.application'
-apply plugin: 'me.tatarka.retrolambda'
-```
-
-### Using the JACK Compiler
-
-To activate it you need to modify three things in your build.gradle:
- 1. Set your `buildToolsVersion` to `24.0.0` or higher.
- 2. Enable JACK in the `jackOptions` closure.
- 3. Set your language level to Java 8 in the `compileOptions` closure.
-
-If you do that the build.gradle of your app module should look something like this:
-
-```
-android {
-    ...
-    buildToolsVersion '25.0.0'
-
-    defaultConfig {
-        ...
-        jackOptions {
-            enabled = true
-        }
-    }
-    ...
-    compileOptions {
-        targetCompatibility 1.8
-        sourceCompatibility 1.8
-    }
-}
-```
+You can use Java 8 features like lambda expressions and method references by using at least version `26.0.0` of the Android Build Tools.
 
 # Features
 

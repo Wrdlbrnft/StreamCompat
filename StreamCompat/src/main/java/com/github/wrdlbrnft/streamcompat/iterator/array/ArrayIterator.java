@@ -6,7 +6,9 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * Created by kapeller on 10/03/16.
+ * Created with Android Studio<br>
+ * User: kapeller<br>
+ * Date: 10/03/16
  */
 public class ArrayIterator<T> extends BaseIterator<T> implements Iterator<T> {
 

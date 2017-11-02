@@ -1,5 +1,7 @@
 package com.github.wrdlbrnft.streamcompat.characterstream;
 
+import android.support.annotation.NonNull;
+
 import com.github.wrdlbrnft.streamcompat.bytestream.ByteStream;
 import com.github.wrdlbrnft.streamcompat.doublestream.DoubleStream;
 import com.github.wrdlbrnft.streamcompat.floatstream.FloatStream;
@@ -172,6 +174,7 @@ public interface CharacterStream extends Iterable<Character> {
     /**
      * @return
      */
+    @NonNull
     @Override
     CharIterator iterator();
 

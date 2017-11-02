@@ -8,7 +8,9 @@ import com.github.wrdlbrnft.streamcompat.iterator.base.BaseChildIterator;
 import java.util.Iterator;
 
 /**
- * Created by kapeller on 22/03/16.
+ * Created with Android Studio<br>
+ * User: kapeller<br>
+ * Date: 22/03/16
  */
 public class ChildIterator<I, O, C extends Iterator<I>> extends BaseChildIterator<I, O, C> {
 

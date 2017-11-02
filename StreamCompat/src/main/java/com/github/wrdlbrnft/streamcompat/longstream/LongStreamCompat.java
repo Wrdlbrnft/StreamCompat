@@ -13,7 +13,9 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * Created by kapeller on 21/03/16.
+ * Created with Android Studio<br>
+ * User: kapeller<br>
+ * Date: 21/03/16
  */
 public class LongStreamCompat {
 
