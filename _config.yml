@@ -1,0 +1,8 @@
+title: StreamCompat for Android
+description: Use Streams everywhere just like you wish you always could!
+google_analytics: 
+show_downloads: true
+theme: jekyll-theme-cayman
+
+gems:
+  - jekyll-mentions
