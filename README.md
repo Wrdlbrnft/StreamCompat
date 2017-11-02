@@ -20,7 +20,7 @@ final List<ViewModel> viewModels = StreamCompat.of(models)
 To use StreamCompat just add this to the dependencies closure in your build.gradle:
 
 ```
-compile 'com.github.wrdlbrnft:stream-compat:0.3.0.11'
+compile 'com.github.wrdlbrnft:stream-compat:0.3.0.12'
 ```
 
 You can use Java 8 features like lambda expressions and method references by using at least version `26.0.0` of the Android Build Tools.
